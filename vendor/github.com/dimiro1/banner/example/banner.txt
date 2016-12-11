@@ -1,0 +1,18 @@
+  ____                              
+ |  _ \                             
+ | |_) | __ _ _ __  _ __   ___ _ __ 
+ |  _ < / _` | '_ \| '_ \ / _ \ '__|
+ | |_) | (_| | | | | | | |  __/ |   
+ |____/ \__,_|_| |_|_| |_|\___|_|   
+                                    
+GoVersion: {{ .GoVersion }}
+GOOS: {{ .GOOS }}
+GOARCH: {{ .GOARCH }}
+NumCPU: {{ .NumCPU }}
+GOPATH: {{ .GOPATH }}
+GOROOT: {{ .GOROOT }}
+Compiler: {{ .Compiler }}
+ENV: {{ .Env "GOPATH" }}
+Now: {{ .Now "Monday, 2 Jan 2006" }}
+{{ .AnsiColor.BrightGreen }}This text will appear in Green
+{{ .AnsiColor.BrightRed }}This text will appear in Red{{ .AnsiColor.Default }}
