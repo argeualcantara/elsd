@@ -1,5 +1,5 @@
-hash: f2372ddb4136c0ce58c1810766bda4b8ed21d6012a0efd05c79a58cc367ca899
-updated: 2016-12-11T15:05:25.4151221-07:00
+hash: ca0628ac13eb6f180711f73c12791e1a5631052e201f8e36ef54c7af520502c2
+updated: 2016-12-11T16:59:38.0831098-07:00
 imports:
 - name: github.com/aws/aws-sdk-go
   version: 1355b456f6ba4a8453249e0dc7743f16ccac362d
@@ -44,8 +44,8 @@ imports:
   version: 8c199fb6259ffc1af525cc3ad52ee60ba8359669
 - name: github.com/mattn/go-isatty
   version: 30a891c33c7cde7b02a981314b4228ec99380cca
-- name: github.com/uber-go/zap
-  version: 35cd7966cc81adc0449c91b3f6b1939812be73aa
+- name: github.com/Sirupsen/logrus
+  version: d26492970760ca5d33129d2d799e34be5c4782eb
 - name: golang.org/x/sys
   version: 478fcf54317e52ab69f40bb4c7a1520288d7f7ea
   subpackages:

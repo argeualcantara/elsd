@@ -3,10 +3,14 @@ package main
 import (
 	"os"
 	"runtime"
+	"os/signal"
+	"syscall"
 	"strings"
 
 	"github.azc.ext.hp.com/cwp/els-go/rest"
+	"github.azc.ext.hp.com/cwp/els-go/config"
 	"github.com/dimiro1/banner"
+	log "github.com/Sirupsen/logrus"
 )
 
 const (
@@ -35,6 +39,19 @@ func main() {
 	// Shows fancy banner
 	banner.Init(os.Stdout, true, false, strings.NewReader(bannerTxt))
 
+	// Load up configs and setup logging
+	cfg := config.Load()
+	if (cfg.IsDebug) {
+		log.SetLevel(log.DebugLevel)
+	}
+
+	log.SetOutput(os.Stdout)
+
+	log.Info("ELS is starting...")
 	server := rest.New()
-	server.Start()
+	go server.Start()
+
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	log.Warn("received system signal", "signal", <-ch)
 }
