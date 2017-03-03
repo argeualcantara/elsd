@@ -2,15 +2,15 @@ package main
 
 import (
 	"os"
-	"runtime"
 	"os/signal"
-	"syscall"
+	"runtime"
 	"strings"
+	"syscall"
 
-	"github.azc.ext.hp.com/cwp/els-go/rest"
-	"github.azc.ext.hp.com/cwp/els-go/config"
-	"github.com/dimiro1/banner"
 	log "github.com/Sirupsen/logrus"
+	"github.com/dimiro1/banner"
+	"github.com/hpcwp/els-go/config"
+	"github.com/hpcwp/els-go/rest"
 )
 
 const (
@@ -41,7 +41,7 @@ func main() {
 
 	// Load up configs and setup logging
 	cfg := config.Load()
-	if (cfg.IsDebug) {
+	if cfg.IsDebug {
 		log.SetLevel(log.DebugLevel)
 	}
 
