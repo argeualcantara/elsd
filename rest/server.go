@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.azc.ext.hp.com/cwp/els-go/config"
-	"github.azc.ext.hp.com/cwp/els-go/elserror"
-	dynamodbRoutingKeys "github.azc.ext.hp.com/cwp/els-go/dynamodb/routingkeys"
+	"github.com/hpcwp/els-go/config"
+	dynamodbRoutingKeys "github.com/hpcwp/els-go/dynamodb/routingkeys"
+	"github.com/hpcwp/els-go/elserror"
 
-	"github.com/julienschmidt/httprouter"
 	log "github.com/Sirupsen/logrus"
+	"github.com/julienschmidt/httprouter"
 )
 
 const (
 	applicationJson = "application/json"
 )
+
 // Server provides a type to handle the REST server
 type Server struct {
 }
