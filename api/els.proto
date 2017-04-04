@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+
+package els;
+
+// The els service definitio
+service Els {
+    // Get a service
+    rpc GetServiceInstance (Entity) returns (ServiceInstance) {}
+}
+
+message Entity {
+    string id = 1;
+}
+
+
+message ServiceInstance {
+    string serviceUri =1;
+    string tags= 2;
+}
