@@ -2,7 +2,7 @@ LINTIGNOREDOT='awstesting/integration.+should not use dot imports'
 LINTIGNOREDOC='service/[^/]+/(api|service|waiters)\.go:.+(comment on exported|should have comment or be unexported)'
 LINTIGNORECONST='service/[^/]+/(api|service|waiters)\.go:.+(type|struct field|const|func) ([^ ]+) should be ([^ ]+)'
 LINTIGNORESTUTTER='service/[^/]+/(api|service)\.go:.+(and that stutters)'
-LINTIGNOREINFLECT='service/[^/]+/(api|service)\.go:.+method .+ should be '
+LINTIGNOREINFLECT='service/[^/]+/(api|errors|service)\.go:.+(method|const) .+ should be '
 LINTIGNOREINFLECTS3UPLOAD='service/s3/s3manager/upload\.go:.+struct field SSEKMSKeyId should be '
 LINTIGNOREDEPS='vendor/.+\.go'
 UNIT_TEST_TAGS="example codegen"
@@ -70,14 +70,7 @@ smoke-tests: get-deps-tests
 performance: get-deps-tests
 	AWS_TESTING_LOG_RESULTS=${log-detailed} AWS_TESTING_REGION=$(region) AWS_TESTING_DB_TABLE=$(table) gucumber -go-tags "integration" ./awstesting/performance
 
-sandbox-tests: sandbox-test-go14 sandbox-test-go15 sandbox-test-go15-novendorexp sandbox-test-go16 sandbox-test-go17 sandbox-test-go18 sandbox-test-gotip
-
-sandbox-build-go14:
-	docker build -f ./awstesting/sandbox/Dockerfile.test.go1.4 -t "aws-sdk-go-1.4" .
-sandbox-go14: sandbox-build-go14
-	docker run -i -t aws-sdk-go-1.4 bash
-sandbox-test-go14: sandbox-build-go14
-	docker run -t aws-sdk-go-1.4
+sandbox-tests: sandbox-test-go15 sandbox-test-go15-novendorexp sandbox-test-go16 sandbox-test-go17 sandbox-test-go18 sandbox-test-gotip
 
 sandbox-build-go15:
 	docker build -f ./awstesting/sandbox/Dockerfile.test.go1.5 -t "aws-sdk-go-1.5" .
