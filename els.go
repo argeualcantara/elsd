@@ -10,7 +10,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/dimiro1/banner"
 	"github.com/hpcwp/els-go/config"
-	"github.com/hpcwp/els-go/rest"
+	"github.com/galo/els-go/grpc"
 )
 
 const (
@@ -48,7 +48,7 @@ func main() {
 	log.SetOutput(os.Stdout)
 
 	log.Info("ELS is starting...")
-	server := rest.New()
+	server := grpc.NewServer()
 	go server.Start()
 
 	ch := make(chan os.Signal)
