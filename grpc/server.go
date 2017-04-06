@@ -20,7 +20,7 @@ const (
 type MyElsServer struct{}
 
 func (s *MyElsServer) GetServiceInstance(ctx context.Context, in *pb.Entity) (*pb.ServiceInstance, error) {
-	return &pb.ServiceInstance{ServiceUri: "Hello ", Tags: "tags"}, nil
+	return &pb.ServiceInstance{ServiceUri: "http://localhost ", Tags: "rw"}, nil
 }
 
 // NewS creates a gRPC server instance

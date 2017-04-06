@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 
-package els;
+package api;
 
 // The els service definitio
 service Els {
