@@ -1,0 +1,363 @@
+{
+    "memo": "50b8e9ec6265a602094d281c2e7518eb8ad9fab3728efcfcded468158c7f6d51",
+    "projects": [
+        {
+            "name": "github.com/Shopify/sarama",
+            "version": "v1.11.0",
+            "revision": "0fb560e5f7fbcaee2f75e3c34174320709f69944",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/apache/thrift",
+            "version": "0.10.0",
+            "revision": "b2a4d4ae21c789b689dd162deb819665567f481c",
+            "packages": [
+                "lib/go/thrift"
+            ]
+        },
+        {
+            "name": "github.com/aws/aws-sdk-go",
+            "version": "v1.8.10",
+            "revision": "d643bdf04f2cc6f95424f9f4e69037a563fc0736",
+            "packages": [
+                "aws",
+                "aws/awserr",
+                "aws/awsutil",
+                "aws/client",
+                "aws/client/metadata",
+                "aws/corehandlers",
+                "aws/credentials",
+                "aws/credentials/ec2rolecreds",
+                "aws/credentials/endpointcreds",
+                "aws/credentials/stscreds",
+                "aws/defaults",
+                "aws/ec2metadata",
+                "aws/endpoints",
+                "aws/request",
+                "aws/session",
+                "aws/signer/v4",
+                "private/protocol",
+                "private/protocol/json/jsonutil",
+                "private/protocol/jsonrpc",
+                "private/protocol/query",
+                "private/protocol/query/queryutil",
+                "private/protocol/rest",
+                "private/protocol/xml/xmlutil",
+                "service/dynamodb",
+                "service/sts"
+            ]
+        },
+        {
+            "name": "github.com/beorn7/perks",
+            "branch": "master",
+            "revision": "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9",
+            "packages": [
+                "quantile"
+            ]
+        },
+        {
+            "name": "github.com/davecgh/go-spew",
+            "version": "v1.1.0",
+            "revision": "346938d642f2ec3594ed81d874461961cd0faa76",
+            "packages": [
+                "spew"
+            ]
+        },
+        {
+            "name": "github.com/dimiro1/banner",
+            "branch": "master",
+            "revision": "c2f858997d49ffd03f84818bef3c25c2fcc67e16",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/eapache/go-resiliency",
+            "version": "v1.0.0",
+            "revision": "6800482f2c813e689c88b7ed3282262385011890",
+            "packages": [
+                "breaker"
+            ]
+        },
+        {
+            "name": "github.com/eapache/go-xerial-snappy",
+            "branch": "master",
+            "revision": "bb955e01b9346ac19dc29eb16586c90ded99a98c",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/eapache/queue",
+            "version": "v1.0.2",
+            "revision": "ded5959c0d4e360646dc9e9908cff48666781367",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/go-ini/ini",
+            "version": "v1.27.0",
+            "revision": "e7fea39b01aea8d5671f6858f0532f56e8bff3a5",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/go-kit/kit",
+            "branch": "master",
+            "revision": "5d93a23737003ed3ad90359f0aeb25e08dfdf547",
+            "packages": [
+                "endpoint",
+                "log",
+                "metrics",
+                "metrics/internal/lv",
+                "metrics/prometheus",
+                "tracing/opentracing",
+                "transport/grpc",
+                "transport/http"
+            ]
+        },
+        {
+            "name": "github.com/go-logfmt/logfmt",
+            "version": "v0.3.0",
+            "revision": "390ab7935ee28ec6b286364bba9b4dd6410cb3d5",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/go-stack/stack",
+            "version": "v1.5.2",
+            "revision": "100eb0c0a9c5b306ca2fb4f165df21d80ada4b82",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/gogo/protobuf",
+            "version": "v0.4",
+            "revision": "100ba4e885062801d56799d78530b73b178a78f3",
+            "packages": [
+                "proto"
+            ]
+        },
+        {
+            "name": "github.com/golang/protobuf",
+            "branch": "master",
+            "revision": "2bba0603135d7d7f5cb73b2125beeda19c09f4ef",
+            "packages": [
+                "proto",
+                "ptypes/any"
+            ]
+        },
+        {
+            "name": "github.com/golang/snappy",
+            "branch": "master",
+            "revision": "553a641470496b2327abcac10b36396bd98e45c9",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/google/go-genproto",
+            "branch": "master",
+            "revision": "411e09b969b1170a9f0c467558eb4c4c110d9c77",
+            "packages": [
+                "googleapis/rpc/status"
+            ]
+        },
+        {
+            "name": "github.com/jmespath/go-jmespath",
+            "version": "0.2.2",
+            "revision": "3433f3ea46d9f8019119e7dd41274e112a2359a9",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/julienschmidt/httprouter",
+            "version": "v1.1",
+            "revision": "8c199fb6259ffc1af525cc3ad52ee60ba8359669",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/klauspost/crc32",
+            "version": "v1.1",
+            "revision": "cb6bfca970f6908083f26f39a79009d608efd5cd",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/kr/logfmt",
+            "branch": "master",
+            "revision": "b84e30acd515aadc4b783ad4ff83aff3299bdfe0",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/mattn/go-isatty",
+            "version": "v0.0.2",
+            "revision": "fc9e8d8ef48496124e79ae0df75490096eccf6fe",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/matttproud/golang_protobuf_extensions",
+            "version": "v1.0.0",
+            "revision": "3247c84500bff8d9fb6d579d800f20b3e091582c",
+            "packages": [
+                "pbutil"
+            ]
+        },
+        {
+            "name": "github.com/opentracing/opentracing-go",
+            "branch": "master",
+            "revision": "eaa2524c1b95618f98127d9c4149d28b852397b4",
+            "packages": [
+                ".",
+                "ext",
+                "log"
+            ]
+        },
+        {
+            "name": "github.com/openzipkin/zipkin-go-opentracing",
+            "branch": "master",
+            "revision": "c05f3400653380a1e1584a3c519f3bea88a935b3",
+            "packages": [
+                ".",
+                "_thrift/gen-go/scribe",
+                "_thrift/gen-go/zipkincore",
+                "flag",
+                "types",
+                "wire"
+            ]
+        },
+        {
+            "name": "github.com/pierrec/lz4",
+            "branch": "master",
+            "revision": "f5b77fd73d83122495309c0f459b810f83cc291f",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/pierrec/xxHash",
+            "version": "v0.1.1",
+            "revision": "f051bb7f1d1aaf1b5a665d74fb6b0217712c69f7",
+            "packages": [
+                "xxHash32"
+            ]
+        },
+        {
+            "name": "github.com/prometheus/client_golang",
+            "branch": "master",
+            "revision": "08fd2e12372a66e68e30523c7642e0cbc3e4fbde",
+            "packages": [
+                "prometheus",
+                "prometheus/promhttp"
+            ]
+        },
+        {
+            "name": "github.com/prometheus/client_model",
+            "branch": "master",
+            "revision": "6f3806018612930941127f2a7c6c453ba2c527d2",
+            "packages": [
+                "go"
+            ]
+        },
+        {
+            "name": "github.com/prometheus/common",
+            "branch": "master",
+            "revision": "49fee292b27bfff7f354ee0f64e1bc4850462edf",
+            "packages": [
+                "expfmt",
+                "internal/bitbucket.org/ww/goautoneg",
+                "model"
+            ]
+        },
+        {
+            "name": "github.com/prometheus/procfs",
+            "branch": "master",
+            "revision": "a1dba9ce8baed984a2495b658c82687f8157b98f",
+            "packages": [
+                ".",
+                "xfs"
+            ]
+        },
+        {
+            "name": "github.com/rcrowley/go-metrics",
+            "branch": "master",
+            "revision": "1f30fe9094a513ce4c700b9a54458bbb0c96996c",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "golang.org/x/net",
+            "branch": "master",
+            "revision": "d1e1b351919c6738fdeb9893d5c998b161464f0c",
+            "packages": [
+                "context",
+                "context/ctxhttp",
+                "http2",
+                "http2/hpack",
+                "idna",
+                "internal/timeseries",
+                "lex/httplex",
+                "trace"
+            ]
+        },
+        {
+            "name": "golang.org/x/sys",
+            "branch": "master",
+            "revision": "7de4796419dc3b554e6dab3a119a62469569d299",
+            "packages": [
+                "unix"
+            ]
+        },
+        {
+            "name": "golang.org/x/text",
+            "branch": "master",
+            "revision": "f4b4367115ec2de254587813edaa901bc1c723a8",
+            "packages": [
+                "internal/gen",
+                "internal/triegen",
+                "internal/ucd",
+                "secure/bidirule",
+                "transform",
+                "unicode/bidi",
+                "unicode/cldr",
+                "unicode/norm",
+                "unicode/rangetable"
+            ]
+        },
+        {
+            "name": "google.golang.org/grpc",
+            "branch": "master",
+            "revision": "9f9c1906922195abfc35b3791d0aa106af88b6ab",
+            "packages": [
+                ".",
+                "codes",
+                "credentials",
+                "grpclog",
+                "internal",
+                "keepalive",
+                "metadata",
+                "naming",
+                "peer",
+                "stats",
+                "status",
+                "tap",
+                "transport"
+            ]
+        }
+    ]
+}
