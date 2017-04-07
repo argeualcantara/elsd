@@ -1,6 +1,7 @@
 package elssrv
 
-import (stdopentracing "github.com/opentracing/opentracing-go"
+import (
+	stdopentracing "github.com/opentracing/opentracing-go"
 	oldcontext "golang.org/x/net/context"
 	"github.com/go-kit/kit/tracing/opentracing"
 	grpctransport "github.com/go-kit/kit/transport/grpc"
@@ -8,8 +9,6 @@ import (stdopentracing "github.com/opentracing/opentracing-go"
 	"context"
 	"github.com/go-kit/kit/log"
 )
-
-
 
 // MakeGRPCServer makes a set of endpoints available as a gRPC AddServer.
 func MakeGRPCServer(endpoints Endpoints, tracer stdopentracing.Tracer, logger log.Logger) api.ElsServer {
@@ -27,8 +26,7 @@ func MakeGRPCServer(endpoints Endpoints, tracer stdopentracing.Tracer, logger lo
 }
 
 type grpcServer struct {
-	getServiceInstance    grpctransport.Handler
-
+	getServiceInstance grpctransport.Handler
 }
 
 func (s *grpcServer) GetServiceInstance(ctx oldcontext.Context, req *api.Entity) (*api.ServiceInstance, error) {
@@ -38,7 +36,6 @@ func (s *grpcServer) GetServiceInstance(ctx oldcontext.Context, req *api.Entity)
 	}
 	return rep.(*api.ServiceInstance), nil
 }
-
 
 // DecodeGRPGetServiceInstanceRequest is a transport/grpc.EncodeRequestFunc that converts a
 // grpc Entity request into a user-domain DecodeGRPGetServiceInstanceRequest
@@ -51,7 +48,7 @@ func DecodeGRPGetServiceInstanceRequest(_ context.Context, grpcReq interface{}) 
 func EncodeGRPCGetServiceInstanceResponse(_ context.Context, response interface{}) (interface{}, error) {
 	resp := response.(getServiceInstanceResponse)
 	return &api.ServiceInstance{ServiceUri: resp.ServiceInstance.Url,
-		Tags: resp.ServiceInstance.Metadata}, nil
+		Tags:                           resp.ServiceInstance.Metadata}, nil
 }
 
 func EncodeGRPCGetServiceInstanceRequest(_ context.Context, request interface{}) (interface{}, error) {
@@ -59,9 +56,9 @@ func EncodeGRPCGetServiceInstanceRequest(_ context.Context, request interface{})
 	return &api.Entity{req.RoutingKey}, nil
 }
 
-func DecodeGRPGetServiceInstanceResponse(_ context.Context, grpcReply interface{}) (interface{}, error){
+func DecodeGRPGetServiceInstanceResponse(_ context.Context, grpcReply interface{}) (interface{}, error) {
 	reply := grpcReply.(*api.ServiceInstance)
-	return getServiceInstanceResponse{ ServiceInstance{reply.ServiceUri, reply.Tags},
-		""}, nil
+	return getServiceInstanceResponse{ServiceInstance{reply.ServiceUri, reply.Tags},
+					  ""}, nil
 
 }

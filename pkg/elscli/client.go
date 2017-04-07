@@ -1,4 +1,4 @@
-// Package grpc provides a gRPC client for the add service.
+// Package grpc provides a gRPC client for the els service.
 package grpc
 
 import (
@@ -16,7 +16,6 @@ import (
 	"github.com/go-kit/kit/tracing/opentracing"
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 	"time"
-
 )
 
 func New(conn *grpc.ClientConn, tracer stdopentracing.Tracer, logger log.Logger) elssrv.ElsService {
@@ -47,7 +46,7 @@ func New(conn *grpc.ClientConn, tracer stdopentracing.Tracer, logger log.Logger)
 		}))(getServiceInstanceEndpoint)
 	}
 
-	return  elssrv.Endpoints {
+	return elssrv.Endpoints{
 		GetServiceInstanceEndpoint: getServiceInstanceEndpoint,
 	}
 }
