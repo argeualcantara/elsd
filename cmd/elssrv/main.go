@@ -14,6 +14,19 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/go-kit/kit/metrics"
+	"github.com/go-kit/kit/endpoint"
+	"github.com/galo/els-go/pkg/elsService"
+	"github.com/go-kit/kit/tracing/opentracing"
+	"syscall"
+	"fmt"
+	"os/signal"
+	"context"
+	"net/http"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http/pprof"
+	"net"
+	"google.golang.org/grpc"
+	"github.com/galo/els-go/pkg/api"
 )
 
 const (
@@ -60,18 +73,13 @@ func main() {
 	banner.Init(os.Stdout, true, false, strings.NewReader(bannerTxt))
 
 	// Metrics domain.
-	var ints, chars metrics.Counter
+	var ints metrics.Counter
 	{
 		// Business level metrics.
 		ints = prometheus.NewCounterFrom(stdprometheus.CounterOpts{
 			Namespace: "addsvc",
 			Name:      "integers_summed",
 			Help:      "Total count of integers summed via the Sum method.",
-		}, []string{})
-		chars = prometheus.NewCounterFrom(stdprometheus.CounterOpts{
-			Namespace: "addsvc",
-			Name:      "characters_concatenated",
-			Help:      "Total count of characters concatenated via the Concat method.",
 		}, []string{})
 	}
 	var duration metrics.Histogram
@@ -83,6 +91,131 @@ func main() {
 			Help:      "Request duration in nanoseconds.",
 		}, []string{"method", "success"})
 	}
+
+	// Tracing domain.
+	var tracer stdopentracing.Tracer
+	{
+		if *zipkinAddr != "" {
+			logger := log.With(logger, "tracer", "ZipkinHTTP")
+			logger.Log("addr", *zipkinAddr)
+
+			// endpoint typically looks like: http://zipkinhost:9411/api/v1/spans
+			collector, err := zipkin.NewHTTPCollector(*zipkinAddr)
+			if err != nil {
+				logger.Log("err", err)
+				os.Exit(1)
+			}
+			defer collector.Close()
+
+			tracer, err = zipkin.NewTracer(
+				zipkin.NewRecorder(collector, false, "localhost:80", "addsvc"),
+			)
+			if err != nil {
+				logger.Log("err", err)
+				os.Exit(1)
+			}
+		} else if *zipkinKafkaAddr != "" {
+			logger := log.With(logger, "tracer", "ZipkinKafka")
+			logger.Log("addr", *zipkinKafkaAddr)
+
+			collector, err := zipkin.NewKafkaCollector(
+				strings.Split(*zipkinKafkaAddr, ","),
+				zipkin.KafkaLogger(log.NewNopLogger()),
+			)
+			if err != nil {
+				logger.Log("err", err)
+				os.Exit(1)
+			}
+			defer collector.Close()
+
+			tracer, err = zipkin.NewTracer(
+				zipkin.NewRecorder(collector, false, "localhost:80", "addsvc"),
+			)
+			if err != nil {
+				logger.Log("err", err)
+				os.Exit(1)
+			}
+		} else {
+			logger := log.With(logger, "tracer", "none")
+			logger.Log()
+			tracer = stdopentracing.GlobalTracer() // no-op
+		}
+	}
+
+	// Business domain.
+	var service elsService.ElsService
+	{
+		service = elsService.NewBasicService()
+		service = elsService.ServiceLoggingMiddleware(logger)(service)
+		service = elsService.ServiceInstrumentingMiddleware(ints)(service)
+	}
+
+	// Endpoint domain.
+	var getInstanceEndpoint endpoint.Endpoint
+	{
+		getInstanceDuration := duration.With("method", "getServiceInstance")
+		getInstanceLogger := log.With(logger, "method", "getServiceInstance")
+
+		getInstanceEndpoint = elsService.MakeGetSrvInstEndpoint(service)
+		getInstanceEndpoint = opentracing.TraceServer(tracer, "getServiceInstance")(getInstanceEndpoint)
+		getInstanceEndpoint = elsService.EndpointInstrumentingMiddleware(getInstanceDuration)(getInstanceEndpoint)
+		getInstanceEndpoint = elsService.EndpointLoggingMiddleware(getInstanceLogger)(getInstanceEndpoint)
+	}
+
+
+	endpoints := elsService.Endpoints{
+		GetSrvInstEndpoint:    getInstanceEndpoint,
+	}
+
+
+	// Mechanical domain.
+	errc := make(chan error)
+	context.Background()
+
+	// Interrupt handler.
+	go func() {
+		c := make(chan os.Signal, 1)
+		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+		errc <- fmt.Errorf("%s", <-c)
+	}()
+
+	// Debug listener.
+	go func() {
+		logger := log.With(logger, "transport", "debug")
+
+		m := http.NewServeMux()
+		m.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
+		m.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
+		m.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
+		m.Handle("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
+		m.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
+		m.Handle("/metrics", promhttp.Handler())
+
+		logger.Log("addr", *debugAddr)
+		errc <- http.ListenAndServe(*debugAddr, m)
+	}()
+
+	// gRPC transport.
+	go func() {
+		logger := log.With(logger, "transport", "gRPC")
+
+		ln, err := net.Listen("tcp", *grpcAddr)
+		if err != nil {
+			errc <- err
+			return
+		}
+
+		srv := elsService.MakeGRPCServer(endpoints, tracer, logger)
+		s := grpc.NewServer()
+		api.RegisterElsServer(s, srv)
+
+		logger.Log("addr", *grpcAddr)
+		errc <- s.Serve(ln)
+	}()
+
+
+	// Run!
+	logger.Log("exit", <-errc)
 
 }
 

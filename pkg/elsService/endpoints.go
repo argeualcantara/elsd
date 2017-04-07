@@ -1,4 +1,4 @@
-package service
+package elsService
 
 import (
 	"github.com/go-kit/kit/endpoint"

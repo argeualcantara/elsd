@@ -1,12 +1,12 @@
-package service
+package elsService
 
-import ("log"
-	stdopentracing "github.com/opentracing/opentracing-go"
+import (stdopentracing "github.com/opentracing/opentracing-go"
 	oldcontext "golang.org/x/net/context"
 	"github.com/go-kit/kit/tracing/opentracing"
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 	"github.com/galo/els-go/pkg/api"
 	"context"
+	"github.com/go-kit/kit/log"
 )
 
 
