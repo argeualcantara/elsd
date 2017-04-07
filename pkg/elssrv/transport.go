@@ -50,5 +50,18 @@ func DecodeGRPGetServiceInstanceRequest(_ context.Context, grpcReq interface{}) 
 
 func EncodeGRPCGetServiceInstanceResponse(_ context.Context, response interface{}) (interface{}, error) {
 	resp := response.(getServiceInstanceResponse)
-	return &api.ServiceInstance{resp.ServiceInstance.Url, resp.ServiceInstance.Metadata}, nil
+	return &api.ServiceInstance{ServiceUri: resp.ServiceInstance.Url,
+		Tags: resp.ServiceInstance.Metadata}, nil
+}
+
+func EncodeGRPCGetServiceInstanceRequest(_ context.Context, request interface{}) (interface{}, error) {
+	req := request.(getServiceInstanceRequest)
+	return &api.Entity{req.RoutingKey}, nil
+}
+
+func DecodeGRPGetServiceInstanceResponse(_ context.Context, grpcReply interface{}) (interface{}, error){
+	reply := grpcReply.(*api.ServiceInstance)
+	return getServiceInstanceResponse{ ServiceInstance{reply.ServiceUri, reply.Tags},
+		""}, nil
+
 }

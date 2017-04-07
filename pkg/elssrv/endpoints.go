@@ -30,7 +30,7 @@ type Endpoints struct {
 
 // GetServiceInstance implements ElsService. Primarily useful in a client.
 func (e Endpoints) GetServiceInstance( routingKey string) (ServiceInstance, error) {
-	request := getServiceInstanceRequest{routingKey: routingKey}
+	request := getServiceInstanceRequest{RoutingKey: routingKey}
 	ctx := context.Background()
 
 	response, err := e.GetServiceInstanceEndpoint(ctx ,request)
@@ -44,7 +44,7 @@ func (e Endpoints) GetServiceInstance( routingKey string) (ServiceInstance, erro
 func MakeGetSrvInstEndpoint(svc ElsService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(getServiceInstanceRequest)
-		v, err := svc.GetServiceInstance(req.routingKey)
+		v, err := svc.GetServiceInstance(req.RoutingKey)
 		if err != nil {
 			return getServiceInstanceResponse{v, err.Error()}, nil
 		}
@@ -85,7 +85,7 @@ func EndpointLoggingMiddleware(logger log.Logger) endpoint.Middleware {
 }
 
 type getServiceInstanceRequest struct {
-	routingKey string `json:"routingKey"`
+	RoutingKey string `json:"routingKey"`
 }
 
 type getServiceInstanceResponse struct {

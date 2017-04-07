@@ -34,8 +34,8 @@ func New(conn *grpc.ClientConn, tracer stdopentracing.Tracer, logger log.Logger)
 			conn,
 			"ElsService",
 			"GetServiceInstance",
-			elssrv.EncodeGRPCGetServiceInstanceResponse,
-			elssrv.DecodeGRPGetServiceInstanceRequest,
+			elssrv.EncodeGRPCGetServiceInstanceRequest,
+			elssrv.DecodeGRPGetServiceInstanceResponse,
 			api.ServiceInstance{},
 			grpctransport.ClientBefore(opentracing.ToGRPCRequest(tracer, logger)),
 		).Endpoint()
