@@ -164,7 +164,7 @@ func main() {
 
 
 	endpoints := elssrv.Endpoints{
-		GetSrvInstEndpoint:    getInstanceEndpoint,
+		GetServiceInstanceEndpoint:    getInstanceEndpoint,
 	}
 
 

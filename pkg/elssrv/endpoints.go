@@ -25,8 +25,21 @@ import (
 // construct individual endpoints using transport/http.NewClient, combine them
 // into an Endpoints, and return it to the caller as a Service.
 type Endpoints struct {
-	GetSrvInstEndpoint  endpoint.Endpoint
+	GetServiceInstanceEndpoint  endpoint.Endpoint
 }
+
+// GetServiceInstance implements ElsService. Primarily useful in a client.
+func (e Endpoints) GetServiceInstance( routingKey string) (ServiceInstance, error) {
+	request := getServiceInstanceRequest{routingKey: routingKey}
+	ctx := context.Background()
+
+	response, err := e.GetServiceInstanceEndpoint(ctx ,request)
+	if err != nil {
+		return ServiceInstance{}, err
+	}
+	return response.(getServiceInstanceResponse).ServiceInstance, nil
+}
+
 
 func MakeGetSrvInstEndpoint(svc ElsService) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {

@@ -46,8 +46,8 @@ func New(conn *grpc.ClientConn, tracer stdopentracing.Tracer, logger log.Logger)
 			Timeout: 30 * time.Second,
 		}))(getServiceInstanceEndpoint)
 	}
-	
+
 	return  elssrv.Endpoints {
-		GetSrvInstEndpoint: getServiceInstanceEndpoint,
+		GetServiceInstanceEndpoint: getServiceInstanceEndpoint,
 	}
 }

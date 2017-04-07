@@ -18,7 +18,7 @@ func MakeGRPCServer(endpoints Endpoints, tracer stdopentracing.Tracer, logger lo
 	}
 	return &grpcServer{
 		getServiceInstance: grpctransport.NewServer(
-			endpoints.GetSrvInstEndpoint,
+			endpoints.GetServiceInstanceEndpoint,
 			DecodeGRPGetServiceInstanceRequest,
 			EncodeGRPCGetServiceInstanceResponse,
 			append(options, grpctransport.ServerBefore(opentracing.FromGRPCRequest(tracer, "Sum", logger)))...,
