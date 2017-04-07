@@ -1,4 +1,4 @@
-package elsService
+package elssrv
 
 import (stdopentracing "github.com/opentracing/opentracing-go"
 	oldcontext "golang.org/x/net/context"

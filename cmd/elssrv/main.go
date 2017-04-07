@@ -15,7 +15,7 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/kit/endpoint"
-	"github.com/galo/els-go/pkg/elsService"
+	"github.com/galo/els-go/pkg/elssrv"
 	"github.com/go-kit/kit/tracing/opentracing"
 	"syscall"
 	"fmt"
@@ -143,11 +143,11 @@ func main() {
 	}
 
 	// Business domain.
-	var service elsService.ElsService
+	var service elssrv.ElsService
 	{
-		service = elsService.NewBasicService()
-		service = elsService.ServiceLoggingMiddleware(logger)(service)
-		service = elsService.ServiceInstrumentingMiddleware(ints)(service)
+		service = elssrv.NewBasicService()
+		service = elssrv.ServiceLoggingMiddleware(logger)(service)
+		service = elssrv.ServiceInstrumentingMiddleware(ints)(service)
 	}
 
 	// Endpoint domain.
@@ -156,14 +156,14 @@ func main() {
 		getInstanceDuration := duration.With("method", "getServiceInstance")
 		getInstanceLogger := log.With(logger, "method", "getServiceInstance")
 
-		getInstanceEndpoint = elsService.MakeGetSrvInstEndpoint(service)
+		getInstanceEndpoint = elssrv.MakeGetSrvInstEndpoint(service)
 		getInstanceEndpoint = opentracing.TraceServer(tracer, "getServiceInstance")(getInstanceEndpoint)
-		getInstanceEndpoint = elsService.EndpointInstrumentingMiddleware(getInstanceDuration)(getInstanceEndpoint)
-		getInstanceEndpoint = elsService.EndpointLoggingMiddleware(getInstanceLogger)(getInstanceEndpoint)
+		getInstanceEndpoint = elssrv.EndpointInstrumentingMiddleware(getInstanceDuration)(getInstanceEndpoint)
+		getInstanceEndpoint = elssrv.EndpointLoggingMiddleware(getInstanceLogger)(getInstanceEndpoint)
 	}
 
 
-	endpoints := elsService.Endpoints{
+	endpoints := elssrv.Endpoints{
 		GetSrvInstEndpoint:    getInstanceEndpoint,
 	}
 
@@ -205,7 +205,7 @@ func main() {
 			return
 		}
 
-		srv := elsService.MakeGRPCServer(endpoints, tracer, logger)
+		srv := elssrv.MakeGRPCServer(endpoints, tracer, logger)
 		s := grpc.NewServer()
 		api.RegisterElsServer(s, srv)
 

@@ -6,10 +6,10 @@ import (
 	"fmt"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
-
+	"github.com/galo/els-go/pkg/elssrv"
+	grpcclient "github.com/galo/els-go/pkg/elscli"
 	"github.com/go-kit/kit/log"
 	"strings"
-	"github.com/galo/els-go/pkg/elsService"
 	"google.golang.org/grpc"
 	"time"
 )
@@ -77,7 +77,7 @@ func main() {
 	}
 
 	var (
-		service elsService.ElsService
+		service elssrv.ElsService
 		err     error
 	)
 

@@ -1,5 +1,5 @@
 {
-    "memo": "50b8e9ec6265a602094d281c2e7518eb8ad9fab3728efcfcded468158c7f6d51",
+    "memo": "f6cee8878aeed98b1adf85f1aa3c55d69b8dc5ecb399b86bff50816fca12bc06",
     "projects": [
         {
             "name": "github.com/Shopify/sarama",
@@ -7,6 +7,16 @@
             "revision": "0fb560e5f7fbcaee2f75e3c34174320709f69944",
             "packages": [
                 "."
+            ]
+        },
+        {
+            "name": "github.com/afex/hystrix-go",
+            "branch": "master",
+            "revision": "39520ddd07a9d9a071d615f7476798659f5a3b89",
+            "packages": [
+                "hystrix",
+                "hystrix/metric_collector",
+                "hystrix/rolling"
             ]
         },
         {
@@ -110,11 +120,13 @@
             "branch": "master",
             "revision": "5d93a23737003ed3ad90359f0aeb25e08dfdf547",
             "packages": [
+                "circuitbreaker",
                 "endpoint",
                 "log",
                 "metrics",
                 "metrics/internal/lv",
                 "metrics/prometheus",
+                "ratelimit",
                 "tracing/opentracing",
                 "transport/grpc",
                 "transport/http"
@@ -173,6 +185,14 @@
             "name": "github.com/jmespath/go-jmespath",
             "version": "0.2.2",
             "revision": "3433f3ea46d9f8019119e7dd41274e112a2359a9",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/juju/ratelimit",
+            "branch": "master",
+            "revision": "acf38b000a03e4ab89e40f20f1e548f4e6ac7f72",
             "packages": [
                 "."
             ]
@@ -298,6 +318,22 @@
             "revision": "1f30fe9094a513ce4c700b9a54458bbb0c96996c",
             "packages": [
                 "."
+            ]
+        },
+        {
+            "name": "github.com/sony/gobreaker",
+            "branch": "master",
+            "revision": "809bcd5a528f344e95c2368796c9225d128f9b3e",
+            "packages": [
+                "."
+            ]
+        },
+        {
+            "name": "github.com/streadway/handy",
+            "branch": "master",
+            "revision": "f450267a206e480d863d2a92846a40f6e2896b2a",
+            "packages": [
+                "breaker"
             ]
         },
         {

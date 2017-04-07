@@ -1,4 +1,4 @@
-package elsService
+package elssrv
 
 // This file contains the Service definition, and a basic service
 // implementation. It also includes service middlewares.
