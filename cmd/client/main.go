@@ -2,16 +2,16 @@ package main
 
 import (
 	"flag"
-	"os"
 	"fmt"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/galo/els-go/pkg/elssrv"
+	"github.com/go-kit/kit/log"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	zipkin "github.com/openzipkin/zipkin-go-opentracing"
-	"github.com/galo/els-go/pkg/elssrv"
-	grpcclient "github.com/galo/els-go/pkg/elscli"
-	"github.com/go-kit/kit/log"
-	"strings"
 	"google.golang.org/grpc"
-	"time"
 )
 
 func main() {

@@ -8,11 +8,14 @@ import (
 	"github.com/go-kit/kit/log"
 	"time"
 	"github.com/go-kit/kit/metrics"
+	"github.com/galo/els-go/pkg/api"
+	"golang.org/x/net/context"
 )
 
 // Service describes a service that adds things together.
 type ElsService interface {
-	GetServiceInstance(routingKey string) (ServiceInstance, error)
+
+	GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error)
 }
 
 type ServiceInstance struct {
@@ -23,12 +26,13 @@ type ServiceInstance struct {
 type basicElsService struct{}
 
 // The implementation of the service
-func (basicElsService) GetServiceInstance(routingKey string) (ServiceInstance, error) {
-	if routingKey == "" {
-		return ServiceInstance{}, ErrInvalid
+func (basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error) {
+	if routingKey.Id == "" {
+		return &api.ServiceInstance{}, ErrInvalid
 	}
-	srvInstance := ServiceInstance{"http://localhost", "rw"}
-	return srvInstance, nil
+	//TODO: returning a fake instance
+	srvInstance := api.ServiceInstance{"http://localhost", "rw"}
+	return &srvInstance, nil
 }
 
 // NewBasicService returns a naïve, stateless implementation of Service.
@@ -52,7 +56,7 @@ type serviceLoggingMiddleware struct {
 	next   ElsService
 }
 
-func (mw serviceLoggingMiddleware) GetServiceInstance(routingKey string) (srvIns ServiceInstance, err error) {
+func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (srvIns *api.ServiceInstance, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "GetServiceInstance",
@@ -60,7 +64,7 @@ func (mw serviceLoggingMiddleware) GetServiceInstance(routingKey string) (srvIns
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	return mw.next.GetServiceInstance(routingKey)
+	return mw.next.GetServiceInstanceByKey(ctx,routingKey)
 }
 
 // ServiceInstrumentingMiddleware returns a service middleware that instruments
@@ -80,8 +84,8 @@ type serviceInstrumentingMiddleware struct {
 	next ElsService
 }
 
-func (mw serviceInstrumentingMiddleware) GetServiceInstance(routingKey string) (ServiceInstance, error) {
-	v, err := mw.GetServiceInstance(routingKey)
+func (mw serviceInstrumentingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error) {
+	v, err := mw.GetServiceInstanceByKey(ctx, routingKey)
 	mw.ints.Add(1)
 	return v, err
 }

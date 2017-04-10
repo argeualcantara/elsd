@@ -8,8 +8,6 @@ import (
 	"os"
 	"flag"
 
-	stdopentracing "github.com/opentracing/opentracing-go"
-	zipkin "github.com/openzipkin/zipkin-go-opentracing"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics/prometheus"
@@ -77,17 +75,6 @@ func main() {
 			Help:      "Total count of integers summed via the Sum method.",
 		}, []string{})
 	}
-	var duration metrics.Histogram
-	{
-		// Transport level metrics.
-		duration = prometheus.NewSummaryFrom(stdprometheus.SummaryOpts{
-			Namespace: "addsvc",
-			Name:      "request_duration_ns",
-			Help:      "Request duration in nanoseconds.",
-		}, []string{"method", "success"})
-	}
-
-
 
 	// Business domain.
 	var service elssrv.ElsService
@@ -96,8 +83,6 @@ func main() {
 		service = elssrv.ServiceLoggingMiddleware(logger)(service)
 		service = elssrv.ServiceInstrumentingMiddleware(ints)(service)
 	}
-
-
 
 	// Mechanical domain.
 	errc := make(chan error)
@@ -125,6 +110,7 @@ func main() {
 		errc <- http.ListenAndServe(*debugAddr, m)
 	}()
 
+
 	// gRPC transport.
 	go func() {
 		logger := log.With(logger, "transport", "gRPC")
@@ -135,9 +121,9 @@ func main() {
 			return
 		}
 
-		srv := elssrv.MakeGRPCServer(logger)
+
 		s := grpc.NewServer()
-		api.RegisterElsServer(s, srv)
+		api.RegisterElsServer(s, service)
 
 		logger.Log("addr", *grpcAddr)
 		errc <- s.Serve(ln)
