@@ -1,27 +1,25 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"github.com/dimiro1/banner"
+	"github.com/galo/els-go/pkg/api"
+	"github.com/galo/els-go/pkg/elssrv"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/metrics"
+	"github.com/go-kit/kit/metrics/prometheus"
+	stdprometheus "github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/grpc"
+	"net"
+	"net/http"
+	"net/http/pprof"
+	"os"
+	"os/signal"
 	"runtime"
 	"strings"
-
-	"github.com/dimiro1/banner"
-	"os"
-	"flag"
-
-	stdprometheus "github.com/prometheus/client_golang/prometheus"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/metrics/prometheus"
-	"github.com/go-kit/kit/metrics"
-	"github.com/galo/els-go/pkg/elssrv"
 	"syscall"
-	"fmt"
-	"os/signal"
-	"net/http"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http/pprof"
-	"net"
-	"google.golang.org/grpc"
-	"github.com/galo/els-go/pkg/api"
 )
 
 const (

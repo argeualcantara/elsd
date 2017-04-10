@@ -1,8 +1,8 @@
 package elscli
 
 import (
-	"github.com/galo/els-go/pkg/api"
 	"context"
+	"github.com/galo/els-go/pkg/api"
 	"github.com/prometheus/common/log"
 )
 

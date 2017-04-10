@@ -5,11 +5,11 @@ package elssrv
 
 import (
 	"errors"
-	"github.com/go-kit/kit/log"
-	"time"
-	"github.com/go-kit/kit/metrics"
 	"github.com/galo/els-go/pkg/api"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/metrics"
 	"golang.org/x/net/context"
+	"time"
 )
 
 // Service describes a service that adds things together.

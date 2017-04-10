@@ -3,12 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
-	"time"
-
+	"github.com/galo/els-go/pkg/api"
 	"github.com/galo/els-go/pkg/elscli"
 	"google.golang.org/grpc"
-	"github.com/galo/els-go/pkg/api"
+	"os"
+	"time"
 )
 
 func main() {
@@ -17,7 +16,7 @@ func main() {
 
 	var (
 		grpcAddr = flag.String("grpc.addr", "", "gRPC (HTTP) address of elssvc")
-		method   = flag.String("method", "getServiceInstance", "getServiceInstance routingKey")
+		method   = flag.String("method", "GetServiceInstanceByKey", "GetServiceInstanceByKey routingKey")
 	)
 	flag.Parse()
 
@@ -38,7 +37,7 @@ func main() {
 	//grpcclient.GetServiceInstanceByKey()
 
 	switch *method {
-	case "getServiceInstance":
+	case "GetServiceInstanceByKey":
 		routingKey := flag.Args()[0]
 
 		v, err := elscli.GetServiceInstanceByKey(client, routingKey)
