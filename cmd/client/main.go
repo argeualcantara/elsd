@@ -13,11 +13,7 @@ import (
 
 func main() {
 	// The elscli presumes no service discovery system, and expects users to
-	// provide the direct address of an elssvc. This presumption is reflected in
-	// the elscli binary and the the client packages: the -transport.addr flags
-	// and various client constructors both expect host:port strings. For an
-	// example service with a client built on top of a service discovery system,
-	// see profilesvc.
+	// provide the direct address of an elssvc. 
 
 	var (
 		grpcAddr        = flag.String("grpc.addr", "", "gRPC (HTTP) address of elssvc")
