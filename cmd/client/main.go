@@ -4,14 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
-	"github.com/galo/els-go/pkg/elssrv"
-	"github.com/go-kit/kit/log"
-	stdopentracing "github.com/opentracing/opentracing-go"
-	zipkin "github.com/openzipkin/zipkin-go-opentracing"
+	"github.com/galo/els-go/pkg/elscli"
 	"google.golang.org/grpc"
+	"github.com/galo/els-go/pkg/api"
 )
 
 func main() {
@@ -24,8 +21,6 @@ func main() {
 
 	var (
 		grpcAddr        = flag.String("grpc.addr", "", "gRPC (HTTP) address of elssvc")
-		zipkinAddr      = flag.String("zipkin.addr", "", "Enable Zipkin tracing via a Zipkin HTTP Collector endpoint")
-		zipkinKafkaAddr = flag.String("zipkin.kafka.addr", "", "Enable Zipkin tracing via a Kafka server host:port")
 		method          = flag.String("method", "getServiceInstance", "getServiceInstance routingKey")
 	)
 	flag.Parse()
@@ -35,51 +30,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	var tracer stdopentracing.Tracer
-	{
-		if *zipkinAddr != "" {
-			// endpoint typically looks like: http://zipkinhost:9411/api/v1/spans
-			collector, err := zipkin.NewHTTPCollector(*zipkinAddr)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				os.Exit(1)
-			}
-			defer collector.Close()
 
-			tracer, err = zipkin.NewTracer(
-				zipkin.NewRecorder(collector, false, "0.0.0.0:0", "addcli"),
-			)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				os.Exit(1)
-			}
-		} else if *zipkinKafkaAddr != "" {
-			collector, err := zipkin.NewKafkaCollector(
-				strings.Split(*zipkinKafkaAddr, ","),
-				zipkin.KafkaLogger(log.NewNopLogger()),
-			)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				os.Exit(1)
-			}
-			defer collector.Close()
-
-			tracer, err = zipkin.NewTracer(
-				zipkin.NewRecorder(collector, false, "0.0.0.0:0", "addcli"),
-			)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "%v\n", err)
-				os.Exit(1)
-			}
-		} else {
-			tracer = stdopentracing.GlobalTracer() // no-op
-		}
-	}
-
-	var (
-		service elssrv.ElsService
-		err     error
-	)
 
 	conn, err := grpc.Dial(*grpcAddr, grpc.WithInsecure(), grpc.WithTimeout(time.Second))
 	if err != nil {
@@ -87,13 +38,17 @@ func main() {
 		os.Exit(1)
 	}
 	defer conn.Close()
-	service = grpcclient.New(conn, tracer, log.NewNopLogger())
+
+	client :=api.NewElsClient(conn)
+
+	//grpcclient.GetServiceInstanceByKey()
 
 	switch *method {
 	case "getServiceInstance":
 		routingKey := flag.Args()[0]
 
-		v, err := service.GetServiceInstance(routingKey)
+		v, err := elscli.GetServiceInstanceByKey(client, routingKey)
+
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
