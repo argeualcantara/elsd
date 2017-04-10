@@ -6,10 +6,10 @@ package api;
 // The els service definitio
 service Els {
     // Get a service
-    rpc GetServiceInstance (Entity) returns (ServiceInstance) {}
+    rpc GetServiceInstanceByKey(RoutingKey) returns (ServiceInstance) {}
 }
 
-message Entity {
+message RoutingKey {
     string id = 1;
 }
 

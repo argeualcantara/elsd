@@ -14,13 +14,10 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/go-kit/kit/metrics"
-	"github.com/go-kit/kit/endpoint"
 	"github.com/galo/els-go/pkg/elssrv"
-	"github.com/go-kit/kit/tracing/opentracing"
 	"syscall"
 	"fmt"
 	"os/signal"
-	"context"
 	"net/http"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http/pprof"
@@ -55,8 +52,6 @@ func main() {
 	var (
 		debugAddr        = flag.String("debug.addr", ":8080", "Debug and metrics listen address")
 		grpcAddr         = flag.String("grpc.addr", ":8082", "gRPC (HTTP) listen address")
-		zipkinAddr       = flag.String("zipkin.addr", "", "Enable Zipkin tracing via a Zipkin HTTP Collector endpoint")
-		zipkinKafkaAddr  = flag.String("zipkin.kafka.addr", "", "Enable Zipkin tracing via a Kafka server host:port")
 	)
 
 	flag.Parse()
@@ -92,55 +87,7 @@ func main() {
 		}, []string{"method", "success"})
 	}
 
-	// Tracing domain.
-	var tracer stdopentracing.Tracer
-	{
-		if *zipkinAddr != "" {
-			logger := log.With(logger, "tracer", "ZipkinHTTP")
-			logger.Log("addr", *zipkinAddr)
 
-			// endpoint typically looks like: http://zipkinhost:9411/api/v1/spans
-			collector, err := zipkin.NewHTTPCollector(*zipkinAddr)
-			if err != nil {
-				logger.Log("err", err)
-				os.Exit(1)
-			}
-			defer collector.Close()
-
-			tracer, err = zipkin.NewTracer(
-				zipkin.NewRecorder(collector, false, "localhost:80", "addsvc"),
-			)
-			if err != nil {
-				logger.Log("err", err)
-				os.Exit(1)
-			}
-		} else if *zipkinKafkaAddr != "" {
-			logger := log.With(logger, "tracer", "ZipkinKafka")
-			logger.Log("addr", *zipkinKafkaAddr)
-
-			collector, err := zipkin.NewKafkaCollector(
-				strings.Split(*zipkinKafkaAddr, ","),
-				zipkin.KafkaLogger(log.NewNopLogger()),
-			)
-			if err != nil {
-				logger.Log("err", err)
-				os.Exit(1)
-			}
-			defer collector.Close()
-
-			tracer, err = zipkin.NewTracer(
-				zipkin.NewRecorder(collector, false, "localhost:80", "addsvc"),
-			)
-			if err != nil {
-				logger.Log("err", err)
-				os.Exit(1)
-			}
-		} else {
-			logger := log.With(logger, "tracer", "none")
-			logger.Log()
-			tracer = stdopentracing.GlobalTracer() // no-op
-		}
-	}
 
 	// Business domain.
 	var service elssrv.ElsService
@@ -150,27 +97,10 @@ func main() {
 		service = elssrv.ServiceInstrumentingMiddleware(ints)(service)
 	}
 
-	// Endpoint domain.
-	var getInstanceEndpoint endpoint.Endpoint
-	{
-		getInstanceDuration := duration.With("method", "getServiceInstance")
-		getInstanceLogger := log.With(logger, "method", "getServiceInstance")
-
-		getInstanceEndpoint = elssrv.MakeGetSrvInstEndpoint(service)
-		getInstanceEndpoint = opentracing.TraceServer(tracer, "getServiceInstance")(getInstanceEndpoint)
-		getInstanceEndpoint = elssrv.EndpointInstrumentingMiddleware(getInstanceDuration)(getInstanceEndpoint)
-		getInstanceEndpoint = elssrv.EndpointLoggingMiddleware(getInstanceLogger)(getInstanceEndpoint)
-	}
-
-
-	endpoints := elssrv.Endpoints{
-		GetServiceInstanceEndpoint:    getInstanceEndpoint,
-	}
 
 
 	// Mechanical domain.
 	errc := make(chan error)
-	context.Background()
 
 	// Interrupt handler.
 	go func() {
@@ -205,7 +135,7 @@ func main() {
 			return
 		}
 
-		srv := elssrv.MakeGRPCServer(endpoints, tracer, logger)
+		srv := elssrv.MakeGRPCServer(logger)
 		s := grpc.NewServer()
 		api.RegisterElsServer(s, srv)
 
