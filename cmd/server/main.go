@@ -48,8 +48,8 @@ func init() {
 
 func main() {
 	var (
-		debugAddr        = flag.String("debug.addr", ":8080", "Debug and metrics listen address")
-		grpcAddr         = flag.String("grpc.addr", ":8082", "gRPC (HTTP) listen address")
+		debugAddr = flag.String("debug.addr", ":8080", "Debug and metrics listen address")
+		grpcAddr  = flag.String("grpc.addr", ":8082", "gRPC (HTTP) listen address")
 	)
 
 	flag.Parse()
@@ -110,7 +110,6 @@ func main() {
 		errc <- http.ListenAndServe(*debugAddr, m)
 	}()
 
-
 	// gRPC transport.
 	go func() {
 		logger := log.With(logger, "transport", "gRPC")
@@ -121,7 +120,6 @@ func main() {
 			return
 		}
 
-
 		s := grpc.NewServer()
 		api.RegisterElsServer(s, service)
 
@@ -129,10 +127,7 @@ func main() {
 		errc <- s.Serve(ln)
 	}()
 
-
 	// Run!
 	logger.Log("exit", <-errc)
 
 }
-
-

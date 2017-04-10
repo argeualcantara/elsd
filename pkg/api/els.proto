@@ -6,7 +6,8 @@ package api;
 // The els service definitio
 service Els {
     // Get a service
-    rpc GetServiceInstanceByKey(RoutingKey) returns (ServiceInstance) {}
+    rpc GetServiceInstanceByKey (RoutingKey) returns (ServiceInstance) {
+    }
 }
 
 message RoutingKey {
@@ -15,6 +16,6 @@ message RoutingKey {
 
 
 message ServiceInstance {
-    string serviceUri =1;
-    string tags= 2;
+    string serviceUri = 1;
+    string tags = 2;
 }

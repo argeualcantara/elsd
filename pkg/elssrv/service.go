@@ -14,7 +14,6 @@ import (
 
 // Service describes a service that adds things together.
 type ElsService interface {
-
 	GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error)
 }
 
@@ -64,7 +63,7 @@ func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, 
 			"took", time.Since(begin),
 		)
 	}(time.Now())
-	return mw.next.GetServiceInstanceByKey(ctx,routingKey)
+	return mw.next.GetServiceInstanceByKey(ctx, routingKey)
 }
 
 // ServiceInstrumentingMiddleware returns a service middleware that instruments

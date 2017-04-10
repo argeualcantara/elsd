@@ -13,11 +13,11 @@ import (
 
 func main() {
 	// The elscli presumes no service discovery system, and expects users to
-	// provide the direct address of an elssvc. 
+	// provide the direct address of an elssvc.
 
 	var (
-		grpcAddr        = flag.String("grpc.addr", "", "gRPC (HTTP) address of elssvc")
-		method          = flag.String("method", "getServiceInstance", "getServiceInstance routingKey")
+		grpcAddr = flag.String("grpc.addr", "", "gRPC (HTTP) address of elssvc")
+		method   = flag.String("method", "getServiceInstance", "getServiceInstance routingKey")
 	)
 	flag.Parse()
 
@@ -26,8 +26,6 @@ func main() {
 		os.Exit(1)
 	}
 
-
-
 	conn, err := grpc.Dial(*grpcAddr, grpc.WithInsecure(), grpc.WithTimeout(time.Second))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v", err)
@@ -35,7 +33,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	client :=api.NewElsClient(conn)
+	client := api.NewElsClient(conn)
 
 	//grpcclient.GetServiceInstanceByKey()
 
