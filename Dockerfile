@@ -5,19 +5,18 @@
 # Computer Software Documentation, and Technical Data for Commercial Items are licensed
 # to the U.S. Government under vendor's standard commercial license.
 #
-FROM alpine:latest
-MAINTAINER ELS Team <els-team@groups.hp.com>
+FROM golang
 
 # Install bash for sanity & profit
 RUN apk add --update bash && rm -rf /var/cache/apk/*
 
-# ELS binary
-ADD ./els /els
+ADD . /go/src/github.com/galo/els-go
+RUN go install github.com/galo/els-go/cmd/server
 
-# Container entrypoint scripts
-ADD ./build/docker/*.sh /
-RUN chmod 755 /*.sh /els
 
-WORKDIR /
-EXPOSE 7300
-ENTRYPOINT ["/bin/bash", "/docker-entrypoint.sh"]
+
+WORKDIR  /go/src/github.com/galo/els-go
+ENTRYPOINT /go/bin/elsd
+
+EXPOSE 8082
+

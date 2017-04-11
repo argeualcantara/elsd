@@ -67,7 +67,7 @@ func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, 
 }
 
 // ServiceInstrumentingMiddleware returns a service middleware that instruments
-// the number of routingKeys accesed over the lifetime of
+// the number of routingKeys accessed over the lifetime of
 // the service.
 func ServiceInstrumentingMiddleware(ints metrics.Counter) Middleware {
 	return func(next ElsService) ElsService {

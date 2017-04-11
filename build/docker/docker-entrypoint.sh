@@ -11,5 +11,8 @@ declare -x ELS_ADDRESS=${ELS_ADDRESS}
 declare -x ELS_PORT=${ELS_PORT}
 declare -x ELS_DEBUG=${ELS_DEBUG}
 
+
+echo "=> Provisioning Dynamodb Table..."
+
 echo "=> Starting ELS..."
 /els
