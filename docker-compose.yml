@@ -20,14 +20,14 @@ services:
         - no_proxy
         - http_proxy
         - https_proxy
-      environment:
-        - ELS_ADDRESS=localhost
-        - ELS_PORT=8082
+    environment:
+      - ELS_ADDRESS=localhost
+      - ELS_PORT=8082
+    ports:
+      - "8082:8082" # gRPC
+    links:
+      - dynamodb
+  dynamodb:
+      image: peopleperhour/dynamodb
       ports:
-        - "8082:8082" # gRPC
-      links:
-        - dynamodb
-    dynamodb:
-        image: peopleperhour/dynamodb
-        ports:
-          - "8000:800" # HTTP
+        - "8000:800" # HTTP

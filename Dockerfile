@@ -7,13 +7,8 @@
 #
 FROM golang
 
-# Install bash for sanity & profit
-RUN apk add --update bash && rm -rf /var/cache/apk/*
-
 ADD . /go/src/github.com/galo/els-go
-RUN go install github.com/galo/els-go/cmd/server
-
-
+RUN go install github.com/galo/els-go/cmd/elsd
 
 WORKDIR  /go/src/github.com/galo/els-go
 ENTRYPOINT /go/bin/elsd
