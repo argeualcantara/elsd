@@ -84,7 +84,7 @@ type serviceInstrumentingMiddleware struct {
 }
 
 func (mw serviceInstrumentingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error) {
-	v, err := mw.GetServiceInstanceByKey(ctx, routingKey)
+	v, err := mw.next.GetServiceInstanceByKey(ctx, routingKey)
 	mw.ints.Add(1)
 	return v, err
 }
