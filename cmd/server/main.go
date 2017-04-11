@@ -82,6 +82,14 @@ func main() {
 		service = elssrv.ServiceInstrumentingMiddleware(ints)(service)
 	}
 
+
+	// Business domain.
+	var basicService elssrv.ElsService
+	{
+		basicService = elssrv.NewBasicService()
+	}
+
+
 	// Mechanical domain.
 	errc := make(chan error)
 
@@ -119,9 +127,9 @@ func main() {
 		}
 
 		s := grpc.NewServer()
-		api.RegisterElsServer(s, service)
+		api.RegisterElsServer(s, basicService)
 
-		logger.Log("addr", elssrv.NewBasicService())
+		logger.Log("addr", basicService)
 		errc <- s.Serve(ln)
 	}()
 
