@@ -6,8 +6,8 @@ package elssrv
 import (
 	"errors"
 	"github.com/galo/els-go/pkg/api"
+	"github.com/galo/els-go/pkg/dynamodb/routingkeys"
 	"golang.org/x/net/context"
-	"github.com/hpcwp/els-go/dynamodb/routingkeys"
 )
 
 // Service describes a service that adds things together.

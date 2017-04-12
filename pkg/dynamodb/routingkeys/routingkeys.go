@@ -10,6 +10,8 @@ import (
 
 const (
 	getProjectionExpression = "StackId, Tags"
+	localEndpoint = "http://localhost:8000"
+	region = "us-west-2"
 )
 
 // Service provides the service object
@@ -37,9 +39,13 @@ func New(tableName string) *Service {
 		panic(err)
 	}
 
+	localConfig := aws.NewConfig().
+		WithEndpoint(localEndpoint).
+		WithRegion(region)
+
 	return &Service{
 		session:   sess,
-		client:    dynamodb.New(sess, aws.NewConfig()),
+		client:    dynamodb.New(sess, localConfig),
 		tableName: &tableName,
 	}
 }
