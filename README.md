@@ -17,7 +17,7 @@ $ docker-compose up
 ## Testing
 
 ```
-go run cmd/elscli/main.go  -grpc.addr localhost:8082 -method GetServiceInstanceByKey mykey
+$ go run cmd/elscli/main.go  -grpc.addr localhost:8082 -method GetServiceInstanceByKey mykey
 ```
 
 
