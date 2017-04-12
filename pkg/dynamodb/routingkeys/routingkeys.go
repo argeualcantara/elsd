@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"log"
 )
 
 const (
@@ -32,6 +33,39 @@ type stack struct {
 	Tags []*string `json:"tags"`
 }
 
+
+func (s *Service) createTable() (*dynamodb.CreateTableOutput, error) {
+	params := &dynamodb.CreateTableInput{
+		TableName: aws.String(*(s.tableName)),
+		AttributeDefinitions: []*dynamodb.AttributeDefinition{
+			{
+				AttributeName: aws.String("Id"),
+				AttributeType: aws.String("S"),
+			},
+			{
+				AttributeName: aws.String("Uri"),
+				AttributeType: aws.String("S"),
+			},
+		},
+		KeySchema: []*dynamodb.KeySchemaElement{
+			{
+				AttributeName: aws.String("Id"),
+				KeyType: aws.String("HASH"),
+			},
+			{
+				AttributeName: aws.String("Uri"),
+				KeyType: aws.String("RANGE"),
+			},
+		},
+		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
+			ReadCapacityUnits: aws.Int64(10),
+			WriteCapacityUnits: aws.Int64(5),
+		},
+	}
+
+	return s.client.CreateTable(params)
+}
+
 // New creates a new RoutingKeysService
 func New(tableName string) *Service {
 	sess, err := session.NewSession()
@@ -43,11 +77,17 @@ func New(tableName string) *Service {
 		WithEndpoint(localEndpoint).
 		WithRegion(region)
 
-	return &Service{
+	svc :=  Service{
 		session:   sess,
 		client:    dynamodb.New(sess, localConfig),
 		tableName: &tableName,
 	}
+	_, err = svc.createTable()
+	if err !=nil {
+		log.Println("Error creating table %s", err)
+	}
+
+	return &svc
 }
 
 // Get returns a Routing Key
