@@ -2,13 +2,11 @@
 
 Entity Locator Service Daemon
 
-
 ## Building
 
 ```
 $ docker-compose up
 ```
-
 
 ## Running
 

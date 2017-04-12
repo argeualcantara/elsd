@@ -121,7 +121,7 @@ func main() {
 		s := grpc.NewServer()
 		api.RegisterElsServer(s, service)
 
-		logger.Log("addr", service)
+		logger.Log("addr", grpcAddr)
 		errc <- s.Serve(ln)
 	}()
 

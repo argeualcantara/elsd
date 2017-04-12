@@ -6,10 +6,8 @@ package elssrv
 import (
 	"errors"
 	"github.com/galo/els-go/pkg/api"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/metrics"
 	"golang.org/x/net/context"
-	"time"
+	"github.com/hpcwp/els-go/dynamodb/routingkeys"
 )
 
 // Service describes a service that adds things together.
@@ -22,71 +20,49 @@ type ServiceInstance struct {
 	Metadata string `json:"metadata"`
 }
 
-type basicElsService struct{}
+type basicElsService struct{
+	rksrv *routingkeys.Service
+}
+
+// Errors
+var (
+	ErrNotFound = errors.New("ServiceInstance not found ")
+)
 
 // The implementation of the service
-func (basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error) {
+func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error) {
+
 	if routingKey.Id == "" {
 		return &api.ServiceInstance{}, ErrInvalid
 	}
-	//TODO: returning a fake instance
-	srvInstance := api.ServiceInstance{"http://localhost", "rw"}
+
+	serviceInstance := bs.rksrv.Get(routingKey.Id)
+
+
+	if serviceInstance == nil {
+		return nil, ErrNotFound
+	}
+	if len(serviceInstance.Stacks) == 0 {
+		return nil, ErrNotFound
+	}
+
+	// We just return teh first service url
+	serviceUrl := serviceInstance.Stacks[0].Name
+	if serviceUrl == nil {
+		return nil, ErrNotFound
+	}
+
+	srvInstance := api.ServiceInstance{*serviceUrl, "rw"}
 	return &srvInstance, nil
 }
 
+const routingKeyTableName  = "routingKeys"
+
 // NewBasicService returns a naïve, stateless implementation of Service.
 func NewBasicService() ElsService {
-	return basicElsService{}
-}
+	rk := routingkeys.New(routingKeyTableName)
 
-// ServiceLoggingMiddleware returns a service middleware that logs the
-// parameters and result of each method invocation.
-func ServiceLoggingMiddleware(logger log.Logger) Middleware {
-	return func(next ElsService) ElsService {
-		return serviceLoggingMiddleware{
-			logger: logger,
-			next:   next,
-		}
-	}
-}
-
-type serviceLoggingMiddleware struct {
-	logger log.Logger
-	next   ElsService
-}
-
-func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (srvIns *api.ServiceInstance, err error) {
-	defer func(begin time.Time) {
-		mw.logger.Log(
-			"method", "GetServiceInstance",
-			"routingKey", routingKey, "result", srvIns, "error", err,
-			"took", time.Since(begin),
-		)
-	}(time.Now())
-	return mw.next.GetServiceInstanceByKey(ctx, routingKey)
-}
-
-// ServiceInstrumentingMiddleware returns a service middleware that instruments
-// the number of routingKeys accessed over the lifetime of
-// the service.
-func ServiceInstrumentingMiddleware(ints metrics.Counter) Middleware {
-	return func(next ElsService) ElsService {
-		return serviceInstrumentingMiddleware{
-			ints: ints,
-			next: next,
-		}
-	}
-}
-
-type serviceInstrumentingMiddleware struct {
-	ints metrics.Counter
-	next ElsService
-}
-
-func (mw serviceInstrumentingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error) {
-	v, err := mw.next.GetServiceInstanceByKey(ctx, routingKey)
-	mw.ints.Add(1)
-	return v, err
+	return basicElsService{rk}
 }
 
 // Middleware describes a service (as opposed to endpoint) middleware.
