@@ -46,7 +46,7 @@ func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKe
 		return nil, ErrNotFound
 	}
 
-	// We just return teh first service url
+	// We just return the first service url
 	serviceUrl := serviceInstance.Stacks[0].Name
 	if serviceUrl == nil {
 		return nil, ErrNotFound
