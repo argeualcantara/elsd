@@ -8,6 +8,26 @@ Entity Locator Service
 $ docker-compose build
 ```
 
+### Modifying the code 
+
+Generating gRPC client and server interfaces.  
+
+```
+$ protoc -I pkg/api/ pkg/api/els.proto --go_out=plugins=grpc:pkg/api
+```
+
+Updating dependencies.  
+```
+$ dep ensure -update
+```
+
+To update a dependency to a new version, you might run
+
+```
+$ dep ensure github.com/pkg/errors@^0.8.0
+
+```
+
 ## Running
 
 ```
