@@ -25,12 +25,12 @@ type Service struct {
 
 // Entity represents a RoutingKey record
 type Entity struct {
-	ID     string  `json:"id"`
-	Stacks []stack `json:"stacks"`
+	ID     	string  `json:"id"`
+	ServiceInstances []serviceInstance `json:"serviceInstance"`
 }
 
-type stack struct {
-	Name *string   `json:"name"`
+type serviceInstance struct {
+	Uri *string   `json:"uri"`
 	Tags []*string `json:"tags"`
 }
 
@@ -86,6 +86,8 @@ func New(tableName string, id string, secret string, token string) *Service {
 		client:    dynamodb.New(sess, localConfig),
 		tableName: &tableName,
 	}
+
+	// create table in dynamo, will fail if the table is already there
 	_, err = svc.createTable()
 	if err !=nil {
 		log.Println("Error creating table: ",  tableName, " error: ", err)
@@ -124,13 +126,13 @@ func fromDynamoToEntity(id string, input *dynamodb.QueryOutput) *Entity {
 		return nil
 	}
 
-	stacks := make([]stack, (length - 1))
+	stacks := make([]serviceInstance, (length - 1))
 	for _, value := range input.Items {
-		stacks = append(stacks, stack{Name: value["StackId"].S, Tags: value["Tags"].SS})
+		stacks = append(stacks, serviceInstance{Uri: value["Uri"].S, Tags: value["Tags"].SS})
 	}
 
 	return &Entity{
 		ID:     id,
-		Stacks: stacks,
+		ServiceInstances: stacks,
 	}
 }
