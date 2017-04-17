@@ -56,11 +56,12 @@ func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKe
 	return &srvInstance, nil
 }
 
-const routingKeyTableName  = "routingKeys"
+const RoutingKeyTableName  = "routingKeys"
 
-// NewBasicService returns a naïve, stateless implementation of Service.
-func NewBasicService() ElsService {
-	rk := routingkeys.New(routingKeyTableName)
+
+// NewBasicService returns a naïve dynamoDb implementation of Service.
+func NewBasicService(tableName string, id string , secret string , token string) ElsService {
+	rk := routingkeys.New(tableName, id, secret, token)
 
 	return basicElsService{rk}
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"log"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 )
 
 const (
@@ -67,13 +68,16 @@ func (s *Service) createTable() (*dynamodb.CreateTableOutput, error) {
 }
 
 // New creates a new RoutingKeysService
-func New(tableName string) *Service {
+func New(tableName string, id string, secret string, token string) *Service {
 	sess, err := session.NewSession()
 	if err != nil {
 		panic(err)
 	}
 
+	creds := credentials.NewStaticCredentials(id, secret, token)
+
 	localConfig := aws.NewConfig().
+		WithCredentials(creds).
 		WithEndpoint(localEndpoint).
 		WithRegion(region)
 
@@ -84,7 +88,7 @@ func New(tableName string) *Service {
 	}
 	_, err = svc.createTable()
 	if err !=nil {
-		log.Println("Error creating table %s", err)
+		log.Println("Error creating table: ",  tableName, " error: ", err)
 	}
 
 	return &svc

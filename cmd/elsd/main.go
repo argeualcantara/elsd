@@ -48,6 +48,9 @@ func main() {
 	var (
 		debugAddr = flag.String("debug.addr", ":8080", "Debug and metrics listen address")
 		grpcAddr  = flag.String("grpc.addr", ":8082", "gRPC (HTTP) listen address")
+		id = flag.String("aws.id", "123", "AWS id")
+		secret = flag.String("aws.secret", "123", "AWS secret")
+		token = flag.String("aws.token", "", "AWS token")
 	)
 
 	flag.Parse()
@@ -74,10 +77,11 @@ func main() {
 		}, []string{})
 	}
 
+
 	// Business domain.
 	var service elssrv.ElsService
 	{
-		service = elssrv.NewBasicService()
+		service = elssrv.NewBasicService(elssrv.RoutingKeyTableName, *id, *secret, *token)
 		service = elssrv.ServiceLoggingMiddleware(logger)(service)
 		service = elssrv.ServiceInstrumentingMiddleware(ints)(service)
 	}
