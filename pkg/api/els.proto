@@ -5,8 +5,12 @@ package api;
 
 // The els service definitio
 service Els {
-    // Get a service
+    // Get a service by routingKey
     rpc GetServiceInstanceByKey (RoutingKey) returns (ServiceInstance) {
+    }
+
+    // Add a routingKey to a service
+    rpc AddRoutingKey (AddRoutingKeyRequest) returns (ServiceInstance){
     }
 }
 
@@ -18,4 +22,11 @@ message RoutingKey {
 message ServiceInstance {
     string serviceUri = 1;
     string tags = 2;
+}
+
+
+message AddRoutingKeyRequest {
+    string serviceUri = 1;
+    string tags = 2;
+    string routinhKey = 3;
 }

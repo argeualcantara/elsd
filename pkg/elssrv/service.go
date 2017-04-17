@@ -13,6 +13,9 @@ import (
 // Service describes a service that adds things together.
 type ElsService interface {
 	GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error)
+
+	// Add a routingKey to a service
+	AddRoutingKey(context.Context, AddroutingKeyRequest *api.AddRoutingKeyRequest) (*ServiceInstance, error)
 }
 
 type ServiceInstance struct {
