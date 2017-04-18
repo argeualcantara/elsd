@@ -8,6 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"log"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"google.golang.org/genproto/googleapis/spanner/admin/instance/v1"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
 const (
@@ -26,12 +28,12 @@ type Service struct {
 // Entity represents a RoutingKey record
 type Entity struct {
 	ID     	string  `json:"id"`
-	ServiceInstances []serviceInstance `json:"serviceInstance"`
+	ServiceInstances []ServiceInstance `json:"serviceInstance"`
 }
 
-type serviceInstance struct {
-	Uri *string   `json:"uri"`
-	Tags []*string `json:"tags"`
+type ServiceInstance struct {
+	Uri string   `json:"uri"`
+	Tags []string `json:"tags"`
 }
 
 
@@ -117,18 +119,43 @@ func (s *Service) Get(id string) *Entity {
 		return nil
 	}
 
-	return fromDynamoToEntity(id, entity)
+	return s.fromDynamoToEntity(id, entity)
 }
 
-func fromDynamoToEntity(id string, input *dynamodb.QueryOutput) *Entity {
+
+func (service *Service) Add(instance *ServiceInstance, i string) (*Entity, error) {
+	instances := make([]ServiceInstance,1)
+	instances = append(instances, ServiceInstance{instance.Uri, instance.Tags})
+
+	entity := Entity{i,instances}
+
+	item, err := dynamodbattribute.MarshalMap(entity)
+	if err !=nil {
+		log.Println("Failed to convert", err)
+		return nil, err
+	}
+
+	result, err := service.client.PutItem(&dynamodb.PutItemInput{
+		Item:      item,
+		TableName: aws.String("RoutingKeys"),
+	})
+	if err !=nil {
+		log.Println("Failed to write item", err)
+		return nil, err
+	}
+	return &entity, nil
+}
+
+
+func (s *Service) fromDynamoToEntity(id string, input *dynamodb.QueryOutput) *Entity {
 	length := len(input.Items)
 	if length == 0 {
 		return nil
 	}
 
-	stacks := make([]serviceInstance, (length - 1))
+	stacks := make([]ServiceInstance, (length - 1))
 	for _, value := range input.Items {
-		stacks = append(stacks, serviceInstance{Uri: value["Uri"].S, Tags: value["Tags"].SS})
+		stacks = append(stacks, ServiceInstance{Uri: *value["Uri"].S, Tags: value["Tags"].SS})
 	}
 
 	return &Entity{
@@ -136,3 +163,4 @@ func fromDynamoToEntity(id string, input *dynamodb.QueryOutput) *Entity {
 		ServiceInstances: stacks,
 	}
 }
+

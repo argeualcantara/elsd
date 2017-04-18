@@ -28,5 +28,5 @@ message ServiceInstance {
 message AddRoutingKeyRequest {
     string serviceUri = 1;
     string tags = 2;
-    string routinhKey = 3;
+    string routingKey = 3;
 }

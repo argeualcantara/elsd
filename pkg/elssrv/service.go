@@ -8,14 +8,15 @@ import (
 	"github.com/galo/els-go/pkg/api"
 	"github.com/galo/els-go/pkg/dynamodb/routingkeys"
 	"golang.org/x/net/context"
+	"github.com/hpcwp/els-go/dynamodb/routingkeys"
 )
 
 // Service describes a service that adds things together.
 type ElsService interface {
-	GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error)
+	GetServiceInstanceByKey(ctx context.Context, *api.RoutingKey) (*api.ServiceInstance, error)
 
 	// Add a routingKey to a service
-	AddRoutingKey(context.Context, AddroutingKeyRequest *api.AddRoutingKeyRequest) (*ServiceInstance, error)
+	AddRoutingKey(context.Context, *api.AddRoutingKeyRequest) (*api.ServiceInstance, error)
 }
 
 type ServiceInstance struct {
@@ -58,6 +59,25 @@ func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKe
 	srvInstance := api.ServiceInstance{*serviceUrl, "rw"}
 	return &srvInstance, nil
 }
+
+// The implementation of teh service
+func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstance, error) {
+	if addRoutingKeyRequest.ServiceUri== "" {
+		return &api.ServiceInstance{}, ErrInvalid
+	}
+	if addRoutingKeyRequest.RoutingKey== "" {
+		return &api.ServiceInstance{}, ErrNotFound
+	}
+
+
+	instance := &ServiceInstance{addRoutingKeyRequest.ServiceUri, addRoutingKeyRequest.Tags}
+
+	bs.rksrv.Add(instance, addRoutingKeyRequest.RoutingKey)
+
+	return &api.ServiceInstance{instance.Url,instance.Metadata}, nil
+
+}
+
 
 const RoutingKeyTableName  = "routingKeys"
 
