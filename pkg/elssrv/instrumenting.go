@@ -30,3 +30,10 @@ func (mw serviceInstrumentingMiddleware) GetServiceInstanceByKey(ctx context.Con
 	return v, err
 }
 
+
+func (mw serviceInstrumentingMiddleware) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceReponse, error) {
+	v, err := mw.next.AddRoutingKey(ctx,addRoutingKeyRequest)
+	mw.ints.Add(1)
+	return v, err
+}
+

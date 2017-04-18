@@ -20,7 +20,7 @@ const (
 type Service struct {
 	session   *session.Session
 	client    *dynamodb.DynamoDB
-	tableName *string
+	tableName string
 }
 
 // Entity represents a ServiceInstance records for a given RoutingKey id.
@@ -38,7 +38,7 @@ type ServiceInstance struct {
 
 func (s *Service) createTable() (*dynamodb.CreateTableOutput, error) {
 	params := &dynamodb.CreateTableInput{
-		TableName: aws.String(*(s.tableName)),
+		TableName: aws.String(s.tableName),
 		AttributeDefinitions: []*dynamodb.AttributeDefinition{
 			{
 				AttributeName: aws.String("Id"),
@@ -85,7 +85,7 @@ func New(tableName string, id string, secret string, token string) *Service {
 	svc := Service{
 		session:   sess,
 		client:    dynamodb.New(sess, localConfig),
-		tableName: &tableName,
+		tableName: tableName,
 	}
 
 	// create table in dynamo, will fail if the table is already there
@@ -100,7 +100,7 @@ func New(tableName string, id string, secret string, token string) *Service {
 // Get returns all ServiceInstance for a given Routing Key
 func (s *Service) Get(id string) *Entity {
 	params := &dynamodb.QueryInput{
-		TableName:            s.tableName,
+		TableName:            &s.tableName,
 		ProjectionExpression: aws.String(getProjectionExpression),
 		KeyConditions: map[string]*dynamodb.Condition{
 			"Id": {
@@ -130,7 +130,7 @@ func (s *Service) Add(instance *ServiceInstance) (error) {
 
 	_, err = s.client.PutItem(&dynamodb.PutItemInput{
 		Item:      item,
-		TableName: aws.String("RoutingKeys"),
+		TableName: aws.String( s.tableName),
 	})
 	if err != nil {
 		log.Println("Failed to write item", err)
