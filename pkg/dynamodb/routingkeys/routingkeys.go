@@ -12,7 +12,7 @@ import (
 
 const (
 	getProjectionExpression = "Id, Uri, Tags"
-	localEndpoint           = "http://localhost:8000"
+	localEndpoint           = "http://dynamodb:8000"
 	region                  = "us-west-2"
 )
 
