@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"log"
 	"github.com/aws/aws-sdk-go/aws/credentials"
-	"google.golang.org/genproto/googleapis/spanner/admin/instance/v1"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 )
 
