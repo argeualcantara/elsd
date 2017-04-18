@@ -8,7 +8,6 @@ import (
 	"github.com/galo/els-go/pkg/api"
 	"github.com/galo/els-go/pkg/dynamodb/routingkeys"
 	"golang.org/x/net/context"
-	"github.com/hpcwp/els-go/dynamodb/routingkeys"
 )
 
 // Service describes a service that adds things together.
@@ -52,11 +51,11 @@ func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKe
 
 	// We just return the first service url
 	serviceUrl := serviceInstance.ServiceInstances[0].Uri
-	if serviceUrl == nil {
+	if serviceUrl == "" {
 		return nil, ErrNotFound
 	}
 
-	srvInstance := api.ServiceInstance{*serviceUrl, "rw"}
+	srvInstance := api.ServiceInstance{serviceUrl, "rw"}
 	return &srvInstance, nil
 }
 
@@ -70,11 +69,11 @@ func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyReques
 	}
 
 
-	instance := &ServiceInstance{addRoutingKeyRequest.ServiceUri, addRoutingKeyRequest.Tags}
+	instance := &routingkeys.ServiceInstance{addRoutingKeyRequest.ServiceUri, addRoutingKeyRequest.Tags}
 
 	bs.rksrv.Add(instance, addRoutingKeyRequest.RoutingKey)
 
-	return &api.ServiceInstance{instance.Url,instance.Metadata}, nil
+	return &api.ServiceInstance{instance.Uri,instance.Tags[0]}, nil
 
 }
 
