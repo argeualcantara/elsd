@@ -9,9 +9,25 @@
 version: "2"
 services:
   elsd:
-    image: cwp/els:1.5.0
+    image: hpccp/elsd:latest
+    container_name: elsd
+    build:
+      context: .
+      args:
+        - NO_PROXY
+        - HTTP_PROXY
+        - HTTPS_PROXY
+        - no_proxy
+        - http_proxy
+        - https_proxy
     environment:
       - ELS_ADDRESS=localhost
-      - ELS_PORT=7300
+      - ELS_PORT=8082
     ports:
-      - "7300:7300" # HTTP
+      - "8082:8082" # gRPC
+    links:
+      - dynamodb
+  dynamodb:
+      image: peopleperhour/dynamodb
+      ports:
+        - "8000:8000" # HTTP

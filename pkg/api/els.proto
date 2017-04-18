@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+
+package api;
+
+// The els service definitio
+service Els {
+    // Get a service by routingKey
+    rpc GetServiceInstanceByKey (RoutingKeyRequest) returns (ServiceInstanceReponse) {
+    }
+
+    // Add a routingKey to a service
+    rpc AddRoutingKey (AddRoutingKeyRequest) returns (ServiceInstanceReponse){
+    }
+}
+
+message RoutingKeyRequest {
+    string id = 1;
+}
+
+
+message ServiceInstanceReponse {
+    string serviceUri = 1;
+    string tags = 2;
+}
+
+
+message AddRoutingKeyRequest {
+    string serviceUri = 1;
+    string tags = 2;
+    string routingKey = 3;
+}

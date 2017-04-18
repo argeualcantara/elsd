@@ -11,5 +11,11 @@ declare -x ELS_ADDRESS=${ELS_ADDRESS}
 declare -x ELS_PORT=${ELS_PORT}
 declare -x ELS_DEBUG=${ELS_DEBUG}
 
+
+echo "=> Provisioning DynamoDb Table..."
+aws dynamodb list-tables --endpoint-url http://localhost:8000
+
+aws dynamodb create-table --table-name RoutingKeys.v1 --attribute-definitions AttributeName=id,AttributeType=S AttributeName=uri,AttributeType=S --key-schema AttributeName=id,KeyType=HASH AttributeName=uri,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 --endpoint-url http://localhost:8000
+
 echo "=> Starting ELS..."
 /els
