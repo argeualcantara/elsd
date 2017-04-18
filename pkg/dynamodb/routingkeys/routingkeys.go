@@ -2,39 +2,39 @@ package routingkeys
 
 import (
 	"fmt"
-
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"log"
-	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"log"
 )
 
 const (
-	getProjectionExpression = "StackId, Tags"
-	localEndpoint = "http://localhost:8000"
-	region = "us-west-2"
+	getProjectionExpression = "Id, Uri, Tags"
+	localEndpoint           = "http://localhost:8000"
+	region                  = "us-west-2"
 )
 
-// Service provides the service object
+// Service provides the s object
 type Service struct {
 	session   *session.Session
 	client    *dynamodb.DynamoDB
 	tableName *string
 }
 
-// Entity represents a RoutingKey record
+// Entity represents a ServiceInstance records for a given RoutingKey id.
 type Entity struct {
-	ID     	string  `json:"id"`
-	ServiceInstances []ServiceInstance `json:"serviceInstance"`
+	Id               string
+	ServiceInstances []ServiceInstance
 }
 
+// ServiceInstance represents single ServiceInstnace record
 type ServiceInstance struct {
-	Uri string   `json:"uri"`
-	Tags []string `json:"tags"`
+	Id   string   `dynamodbav:"Id"`
+	Uri  string   `dynamodbav:"Uri"`
+	Tags []string `dynamodbav:"Tags" dynamodbav:",stringset" `
 }
-
 
 func (s *Service) createTable() (*dynamodb.CreateTableOutput, error) {
 	params := &dynamodb.CreateTableInput{
@@ -52,15 +52,15 @@ func (s *Service) createTable() (*dynamodb.CreateTableOutput, error) {
 		KeySchema: []*dynamodb.KeySchemaElement{
 			{
 				AttributeName: aws.String("Id"),
-				KeyType: aws.String("HASH"),
+				KeyType:       aws.String("HASH"),
 			},
 			{
 				AttributeName: aws.String("Uri"),
-				KeyType: aws.String("RANGE"),
+				KeyType:       aws.String("RANGE"),
 			},
 		},
 		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits: aws.Int64(10),
+			ReadCapacityUnits:  aws.Int64(10),
 			WriteCapacityUnits: aws.Int64(5),
 		},
 	}
@@ -82,7 +82,7 @@ func New(tableName string, id string, secret string, token string) *Service {
 		WithEndpoint(localEndpoint).
 		WithRegion(region)
 
-	svc :=  Service{
+	svc := Service{
 		session:   sess,
 		client:    dynamodb.New(sess, localConfig),
 		tableName: &tableName,
@@ -90,14 +90,14 @@ func New(tableName string, id string, secret string, token string) *Service {
 
 	// create table in dynamo, will fail if the table is already there
 	_, err = svc.createTable()
-	if err !=nil {
-		log.Println("Error creating table: ",  tableName, " error: ", err)
+	if err != nil {
+		log.Println("Error creating table: ", tableName, " error: ", err)
 	}
 
 	return &svc
 }
 
-// Get returns a Routing Key
+// Get returns all ServiceInstance for a given Routing Key
 func (s *Service) Get(id string) *Entity {
 	params := &dynamodb.QueryInput{
 		TableName:            s.tableName,
@@ -112,39 +112,32 @@ func (s *Service) Get(id string) *Entity {
 		},
 	}
 
-	entity, err := s.client.Query(params)
+	items, err := s.client.Query(params)
 	if err != nil {
 		fmt.Printf("error querying dynamodb: %s", err)
 		return nil
 	}
 
-	return s.fromDynamoToEntity(id, entity)
+	return s.fromDynamoToEntity(id, items)
 }
 
-
-func (service *Service) Add(instance *ServiceInstance, i string) (*Entity, error) {
-	instances := make([]ServiceInstance,1)
-	instances = append(instances, ServiceInstance{instance.Uri, instance.Tags})
-
-	entity := Entity{i,instances}
-
-	item, err := dynamodbattribute.MarshalMap(entity)
-	if err !=nil {
+func (s *Service) Add(instance *ServiceInstance) (error) {
+	item, err := dynamodbattribute.MarshalMap(instance)
+	if err != nil {
 		log.Println("Failed to convert", err)
-		return nil, err
+		return err
 	}
 
-	result, err := service.client.PutItem(&dynamodb.PutItemInput{
+	_, err = s.client.PutItem(&dynamodb.PutItemInput{
 		Item:      item,
 		TableName: aws.String("RoutingKeys"),
 	})
-	if err !=nil {
+	if err != nil {
 		log.Println("Failed to write item", err)
-		return nil, err
+		return err
 	}
-	return &entity, nil
+	return nil
 }
-
 
 func (s *Service) fromDynamoToEntity(id string, input *dynamodb.QueryOutput) *Entity {
 	length := len(input.Items)
@@ -152,14 +145,16 @@ func (s *Service) fromDynamoToEntity(id string, input *dynamodb.QueryOutput) *En
 		return nil
 	}
 
-	stacks := make([]ServiceInstance, (length - 1))
-	for _, value := range input.Items {
-		stacks = append(stacks, ServiceInstance{Uri: *value["Uri"].S, Tags: value["Tags"].SS})
+	serviceInstances := []ServiceInstance{}
+
+	err := dynamodbattribute.UnmarshalListOfMaps(input.Items, &serviceInstances)
+	if err != nil {
+		log.Println("Failed to convert", err)
+		return nil
 	}
 
 	return &Entity{
-		ID:     id,
-		ServiceInstances: stacks,
+		Id:               id,
+		ServiceInstances: serviceInstances,
 	}
 }
-

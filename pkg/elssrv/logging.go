@@ -12,7 +12,7 @@ type serviceLoggingMiddleware struct {
 	next   ElsService
 }
 
-func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (srvIns *api.ServiceInstance, err error) {
+func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (srvIns *api.ServiceInstanceReponse, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "GetServiceInstance",

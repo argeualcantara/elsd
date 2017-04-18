@@ -6,8 +6,8 @@ import (
 	"github.com/prometheus/common/log"
 )
 
-func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.ServiceInstance, error) {
-	req := &api.RoutingKey{routingKey}
+func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.ServiceInstanceReponse, error) {
+	req := &api.RoutingKeyRequest{routingKey}
 	resp, err := client.GetServiceInstanceByKey(context.Background(), req)
 	if err != nil {
 		log.Fatalf("Error gettting routing jey: %v", err)

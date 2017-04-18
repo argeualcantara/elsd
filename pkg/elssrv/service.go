@@ -12,10 +12,10 @@ import (
 
 // Service describes a service that adds things together.
 type ElsService interface {
-	GetServiceInstanceByKey(ctx context.Context, *api.RoutingKey) (*api.ServiceInstance, error)
+	GetServiceInstanceByKey(ctx context.Context, request *api.RoutingKeyRequest) (*api.ServiceInstanceReponse, error)
 
 	// Add a routingKey to a service
-	AddRoutingKey(context.Context, *api.AddRoutingKeyRequest) (*api.ServiceInstance, error)
+	AddRoutingKey(context.Context, *api.AddRoutingKeyRequest) (*api.ServiceInstanceReponse, error)
 }
 
 type ServiceInstance struct {
@@ -33,10 +33,10 @@ var (
 )
 
 // The implementation of the service
-func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKey) (*api.ServiceInstance, error) {
+func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceReponse, error) {
 
 	if routingKey.Id == "" {
-		return &api.ServiceInstance{}, ErrInvalid
+		return &api.ServiceInstanceReponse{}, ErrInvalid
 	}
 
 	serviceInstance := bs.rksrv.Get(routingKey.Id)
@@ -55,25 +55,27 @@ func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKe
 		return nil, ErrNotFound
 	}
 
-	srvInstance := api.ServiceInstance{serviceUrl, "rw"}
+	srvInstance := api.ServiceInstanceReponse{serviceUrl, "rw"}
 	return &srvInstance, nil
 }
 
 // The implementation of teh service
-func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstance, error) {
+func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceReponse, error) {
 	if addRoutingKeyRequest.ServiceUri== "" {
-		return &api.ServiceInstance{}, ErrInvalid
+		return &api.ServiceInstanceReponse{}, ErrInvalid
 	}
 	if addRoutingKeyRequest.RoutingKey== "" {
-		return &api.ServiceInstance{}, ErrNotFound
+		return &api.ServiceInstanceReponse{}, ErrNotFound
 	}
 
+	instance := &routingkeys.ServiceInstance{addRoutingKeyRequest.RoutingKey,
+		addRoutingKeyRequest.ServiceUri,
+		[]string{addRoutingKeyRequest.Tags}}
 
-	instance := &routingkeys.ServiceInstance{addRoutingKeyRequest.ServiceUri, addRoutingKeyRequest.Tags}
+	bs.rksrv.Add(instance)
 
-	bs.rksrv.Add(instance, addRoutingKeyRequest.RoutingKey)
-
-	return &api.ServiceInstance{instance.Uri,instance.Tags[0]}, nil
+	return &api.ServiceInstanceReponse{instance.Uri,
+		instance.Tags[0]}, nil
 
 }
 

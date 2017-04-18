@@ -9,8 +9,8 @@ It is generated from these files:
 	els.proto
 
 It has these top-level messages:
-	RoutingKey
-	ServiceInstance
+	RoutingKeyRequest
+	ServiceInstanceReponse
 	AddRoutingKeyRequest
 */
 package api
@@ -35,40 +35,40 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type RoutingKey struct {
+type RoutingKeyRequest struct {
 	Id string `protobuf:"bytes,1,opt,name=id" json:"id,omitempty"`
 }
 
-func (m *RoutingKey) Reset()                    { *m = RoutingKey{} }
-func (m *RoutingKey) String() string            { return proto.CompactTextString(m) }
-func (*RoutingKey) ProtoMessage()               {}
-func (*RoutingKey) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (m *RoutingKeyRequest) Reset()                    { *m = RoutingKeyRequest{} }
+func (m *RoutingKeyRequest) String() string            { return proto.CompactTextString(m) }
+func (*RoutingKeyRequest) ProtoMessage()               {}
+func (*RoutingKeyRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *RoutingKey) GetId() string {
+func (m *RoutingKeyRequest) GetId() string {
 	if m != nil {
 		return m.Id
 	}
 	return ""
 }
 
-type ServiceInstance struct {
+type ServiceInstanceReponse struct {
 	ServiceUri string `protobuf:"bytes,1,opt,name=serviceUri" json:"serviceUri,omitempty"`
 	Tags       string `protobuf:"bytes,2,opt,name=tags" json:"tags,omitempty"`
 }
 
-func (m *ServiceInstance) Reset()                    { *m = ServiceInstance{} }
-func (m *ServiceInstance) String() string            { return proto.CompactTextString(m) }
-func (*ServiceInstance) ProtoMessage()               {}
-func (*ServiceInstance) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (m *ServiceInstanceReponse) Reset()                    { *m = ServiceInstanceReponse{} }
+func (m *ServiceInstanceReponse) String() string            { return proto.CompactTextString(m) }
+func (*ServiceInstanceReponse) ProtoMessage()               {}
+func (*ServiceInstanceReponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *ServiceInstance) GetServiceUri() string {
+func (m *ServiceInstanceReponse) GetServiceUri() string {
 	if m != nil {
 		return m.ServiceUri
 	}
 	return ""
 }
 
-func (m *ServiceInstance) GetTags() string {
+func (m *ServiceInstanceReponse) GetTags() string {
 	if m != nil {
 		return m.Tags
 	}
@@ -108,8 +108,8 @@ func (m *AddRoutingKeyRequest) GetRoutingKey() string {
 }
 
 func init() {
-	proto.RegisterType((*RoutingKey)(nil), "api.RoutingKey")
-	proto.RegisterType((*ServiceInstance)(nil), "api.ServiceInstance")
+	proto.RegisterType((*RoutingKeyRequest)(nil), "api.RoutingKeyRequest")
+	proto.RegisterType((*ServiceInstanceReponse)(nil), "api.ServiceInstanceReponse")
 	proto.RegisterType((*AddRoutingKeyRequest)(nil), "api.AddRoutingKeyRequest")
 }
 
@@ -125,9 +125,9 @@ const _ = grpc.SupportPackageIsVersion4
 
 type ElsClient interface {
 	// Get a service by routingKey
-	GetServiceInstanceByKey(ctx context.Context, in *RoutingKey, opts ...grpc.CallOption) (*ServiceInstance, error)
+	GetServiceInstanceByKey(ctx context.Context, in *RoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceReponse, error)
 	// Add a routingKey to a service
-	AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstance, error)
+	AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceReponse, error)
 }
 
 type elsClient struct {
@@ -138,8 +138,8 @@ func NewElsClient(cc *grpc.ClientConn) ElsClient {
 	return &elsClient{cc}
 }
 
-func (c *elsClient) GetServiceInstanceByKey(ctx context.Context, in *RoutingKey, opts ...grpc.CallOption) (*ServiceInstance, error) {
-	out := new(ServiceInstance)
+func (c *elsClient) GetServiceInstanceByKey(ctx context.Context, in *RoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceReponse, error) {
+	out := new(ServiceInstanceReponse)
 	err := grpc.Invoke(ctx, "/api.Els/GetServiceInstanceByKey", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -147,8 +147,8 @@ func (c *elsClient) GetServiceInstanceByKey(ctx context.Context, in *RoutingKey,
 	return out, nil
 }
 
-func (c *elsClient) AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstance, error) {
-	out := new(ServiceInstance)
+func (c *elsClient) AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceReponse, error) {
+	out := new(ServiceInstanceReponse)
 	err := grpc.Invoke(ctx, "/api.Els/AddRoutingKey", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -160,9 +160,9 @@ func (c *elsClient) AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest,
 
 type ElsServer interface {
 	// Get a service by routingKey
-	GetServiceInstanceByKey(context.Context, *RoutingKey) (*ServiceInstance, error)
+	GetServiceInstanceByKey(context.Context, *RoutingKeyRequest) (*ServiceInstanceReponse, error)
 	// Add a routingKey to a service
-	AddRoutingKey(context.Context, *AddRoutingKeyRequest) (*ServiceInstance, error)
+	AddRoutingKey(context.Context, *AddRoutingKeyRequest) (*ServiceInstanceReponse, error)
 }
 
 func RegisterElsServer(s *grpc.Server, srv ElsServer) {
@@ -170,7 +170,7 @@ func RegisterElsServer(s *grpc.Server, srv ElsServer) {
 }
 
 func _Els_GetServiceInstanceByKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RoutingKey)
+	in := new(RoutingKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func _Els_GetServiceInstanceByKey_Handler(srv interface{}, ctx context.Context, 
 		FullMethod: "/api.Els/GetServiceInstanceByKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ElsServer).GetServiceInstanceByKey(ctx, req.(*RoutingKey))
+		return srv.(ElsServer).GetServiceInstanceByKey(ctx, req.(*RoutingKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -225,18 +225,19 @@ var _Els_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("els.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 205 bytes of a gzipped FileDescriptorProto
+	// 214 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4c, 0xcd, 0x29, 0xd6,
-	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4e, 0x2c, 0xc8, 0x54, 0x92, 0xe1, 0xe2, 0x0a, 0xca,
-	0x2f, 0x2d, 0xc9, 0xcc, 0x4b, 0xf7, 0x4e, 0xad, 0x14, 0xe2, 0xe3, 0x62, 0xca, 0x4c, 0x91, 0x60,
-	0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x62, 0xca, 0x4c, 0x51, 0x72, 0xe5, 0xe2, 0x0f, 0x4e, 0x2d, 0x2a,
-	0xcb, 0x4c, 0x4e, 0xf5, 0xcc, 0x2b, 0x2e, 0x49, 0xcc, 0x4b, 0x4e, 0x15, 0x92, 0xe3, 0xe2, 0x2a,
-	0x86, 0x08, 0x85, 0x16, 0x65, 0x42, 0x95, 0x22, 0x89, 0x08, 0x09, 0x71, 0xb1, 0x94, 0x24, 0xa6,
-	0x17, 0x4b, 0x30, 0x81, 0x65, 0xc0, 0x6c, 0xa5, 0x2c, 0x2e, 0x11, 0xc7, 0x94, 0x14, 0x84, 0x3d,
-	0x41, 0xa9, 0x85, 0xa5, 0xa9, 0xc5, 0x25, 0xe4, 0x98, 0x05, 0xd2, 0x53, 0x04, 0x37, 0x48, 0x82,
-	0x19, 0xa2, 0x07, 0x21, 0x62, 0xd4, 0xcb, 0xc8, 0xc5, 0xec, 0x9a, 0x53, 0x2c, 0xe4, 0xc4, 0x25,
-	0xee, 0x9e, 0x5a, 0x82, 0xe6, 0x7a, 0xa7, 0x4a, 0x90, 0x2f, 0xf9, 0xf5, 0x12, 0x0b, 0x32, 0xf5,
-	0x10, 0xce, 0x91, 0x12, 0x01, 0x0b, 0xa0, 0xa9, 0x55, 0x62, 0x10, 0x72, 0xe2, 0xe2, 0x45, 0x71,
-	0xb7, 0x90, 0x24, 0x58, 0x21, 0x36, 0xbf, 0xe0, 0x32, 0x23, 0x89, 0x0d, 0x1c, 0xd8, 0xc6, 0x80,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0x82, 0xb4, 0x1e, 0xf2, 0x79, 0x01, 0x00, 0x00,
+	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4e, 0x2c, 0xc8, 0x54, 0x52, 0xe6, 0x12, 0x0c, 0xca,
+	0x2f, 0x2d, 0xc9, 0xcc, 0x4b, 0xf7, 0x4e, 0xad, 0x0c, 0x4a, 0x2d, 0x2c, 0x4d, 0x2d, 0x2e, 0x11,
+	0xe2, 0xe3, 0x62, 0xca, 0x4c, 0x91, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x62, 0xca, 0x4c, 0x51,
+	0xf2, 0xe1, 0x12, 0x0b, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c, 0x4e, 0xf5, 0xcc, 0x2b, 0x2e, 0x49, 0xcc,
+	0x4b, 0x4e, 0x0d, 0x4a, 0x2d, 0xc8, 0xcf, 0x2b, 0x4e, 0x15, 0x92, 0xe3, 0xe2, 0x2a, 0x86, 0xc8,
+	0x84, 0x16, 0x65, 0x42, 0x75, 0x20, 0x89, 0x08, 0x09, 0x71, 0xb1, 0x94, 0x24, 0xa6, 0x17, 0x4b,
+	0x30, 0x81, 0x65, 0xc0, 0x6c, 0xa5, 0x2c, 0x2e, 0x11, 0xc7, 0x94, 0x14, 0x4c, 0x5b, 0xc9, 0x30,
+	0x0b, 0xa4, 0xa7, 0x08, 0x6e, 0x90, 0x04, 0x33, 0x44, 0x0f, 0x42, 0xc4, 0x68, 0x11, 0x23, 0x17,
+	0xb3, 0x6b, 0x4e, 0xb1, 0x50, 0x00, 0x97, 0xb8, 0x7b, 0x6a, 0x09, 0x9a, 0x27, 0x9c, 0x2a, 0xbd,
+	0x53, 0x2b, 0x85, 0xc4, 0xf4, 0x12, 0x0b, 0x32, 0xf5, 0x30, 0x9c, 0x23, 0x25, 0x0d, 0x16, 0xc7,
+	0xee, 0x6f, 0x25, 0x06, 0x21, 0x4f, 0x2e, 0x5e, 0x14, 0x5f, 0x08, 0x49, 0x82, 0xd5, 0x63, 0xf3,
+	0x19, 0x01, 0xa3, 0x92, 0xd8, 0xc0, 0xf1, 0x61, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x97, 0xd9,
+	0x5c, 0xa2, 0x9c, 0x01, 0x00, 0x00,
 }
