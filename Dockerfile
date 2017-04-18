@@ -11,6 +11,7 @@ ADD . /go/src/github.com/galo/els-go
 RUN go install github.com/galo/els-go/cmd/elsd
 
 WORKDIR  /go/src/github.com/galo/els-go
+
 ENTRYPOINT /go/bin/elsd
 
 EXPOSE 8082

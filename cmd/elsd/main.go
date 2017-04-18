@@ -24,19 +24,34 @@ import (
 
 const (
 	bannerTxt = `
- ______     __         ______
-/\  ___\   /\ \       /\  ___\
-\ \  __\   \ \ \____  \ \___  \
- \ \_____\  \ \_____\  \/\_____\
-  \/_____/   \/_____/   \/_____/
+{{.AnsiColor.Red}}EEEEEEEEEEEEEEEEEEEEEELLLLLLLLLLL                SSSSSSSSSSSSSSS             d::::::d
+E::::::::::::::::::::EL:::::::::L              SS:::::::::::::::S            d::::::d
+E::::::::::::::::::::EL:::::::::L             S:::::SSSSSS::::::S            d::::::d
+{{.AnsiColor.BrightBlue}}EE::::::EEEEEEEEE::::ELL:::::::LL             S:::::S     SSSSSSS            d:::::d
+  E:::::E       EEEEEE  L:::::L               S:::::S                ddddddddd:::::d
+  E:::::E               L:::::L               S:::::S              dd::::::::::::::d
+  E::::::EEEEEEEEEE     L:::::L                S::::SSSS          d::::::::::::::::d
+  E:::::::::::::::E     L:::::L                 SS::::::SSSSS    d:::::::ddddd:::::d
+  E:::::::::::::::E     L:::::L                   SSS::::::::SS  d::::::d    d:::::d
+  E::::::EEEEEEEEEE     L:::::L                      SSSSSS::::S d:::::d     d:::::d
+  E:::::E               L:::::L                           S:::::Sd:::::d     d:::::d
+  E:::::E       EEEEEE  L:::::L         LLLLLL            S:::::Sd:::::d     d:::::d
+{{ .AnsiColor.Default }}EE::::::EEEEEEEE:::::ELL:::::::LLLLLLLLL:::::LSSSSSSS     S:::::Sd::::::ddddd::::::dd
+E::::::::::::::::::::EL::::::::::::::::::::::LS::::::SSSSSS:::::S d:::::::::::::::::d
+E::::::::::::::::::::EL::::::::::::::::::::::LS:::::::::::::::SS   d:::::::::ddd::::d
+EEEEEEEEEEEEEEEEEEEEEELLLLLLLLLLLLLLLLLLLLLLLL SSSSSSSSSSSSSSS      ddddddddd   ddddd
 
-CWP Entity Locator Service v1.5.0
+CWP Entity Locator Service v2.0.0
 (C) Copyright 2016-2017 HP Development Company, L.P.
 
 GoVersion: {{ .GoVersion }}
+GOOS: {{ .GOOS }}
+GOARCH: {{ .GOARCH }}
 NumCPU: {{ .NumCPU }}
-Now: {{ .Now "Mon, 02 Jan 2006 15:04:05 -0700" }}
-Debug: '{{ .Env "ELS_DEBUG" }}'
+GOPATH: {{ .GOPATH }}
+GOROOT: {{ .GOROOT }}
+Compiler: {{ .Compiler }}
+ENV: {{ .Env "GOPATH" }}
 `
 )
 
@@ -48,6 +63,7 @@ func main() {
 	var (
 		debugAddr = flag.String("debug.addr", ":8080", "Debug and metrics listen address")
 		grpcAddr  = flag.String("grpc.addr", ":8082", "gRPC (HTTP) listen address")
+		dynamoDbAddr  = flag.String("dynamodb.addr", "http://localhost:8080", "DynamoDb (HTTP) address")
 		id = flag.String("aws.id", "123", "AWS id")
 		secret = flag.String("aws.secret", "123", "AWS secret")
 		token = flag.String("aws.token", "", "AWS token")
@@ -64,7 +80,10 @@ func main() {
 	}
 
 	// Shows fancy banner
-	banner.Init(os.Stdout, true, false, strings.NewReader(bannerTxt))
+	banner.Init(os.Stdout, true, true, strings.NewReader(bannerTxt))
+
+
+	logger.Log("debugAddr", debugAddr, "grpcAddr", grpcAddr, "dynamodbAddr", dynamoDbAddr)
 
 	// Metrics domain.
 	var ints metrics.Counter
@@ -77,11 +96,10 @@ func main() {
 		}, []string{})
 	}
 
-
 	// Business domain.
 	var service elssrv.ElsService
 	{
-		service = elssrv.NewBasicService(elssrv.RoutingKeyTableName, *id, *secret, *token)
+		service = elssrv.NewBasicService(elssrv.RoutingKeyTableName, *dynamoDbAddr, *id, *secret, *token)
 		service = elssrv.ServiceLoggingMiddleware(logger)(service)
 		service = elssrv.ServiceInstrumentingMiddleware(ints)(service)
 	}

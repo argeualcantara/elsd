@@ -6,7 +6,7 @@
 # to the U.S. Government under vendor's standard commercial license.
 #
 
-version: "2"
+version: "3"
 services:
   elsd:
     image: hpccp/elsd:latest
@@ -22,6 +22,7 @@ services:
         - https_proxy
     ports:
       - "8082:8082" # gRPC
+    command: "-dynamodb.addr http://dynamodb:8000"
     links:
       - dynamodb
   dynamodb:

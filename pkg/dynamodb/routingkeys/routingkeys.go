@@ -12,7 +12,6 @@ import (
 
 const (
 	getProjectionExpression = "Id, Uri, Tags"
-	localEndpoint           = "http://dynamodb:8000"
 	region                  = "us-west-2"
 )
 
@@ -69,7 +68,7 @@ func (s *Service) createTable() (*dynamodb.CreateTableOutput, error) {
 }
 
 // New creates a new RoutingKeysService
-func New(tableName string, id string, secret string, token string) *Service {
+func New(tableName string, dynamoAddr string, id string, secret string, token string) *Service {
 	sess, err := session.NewSession()
 	if err != nil {
 		panic(err)
@@ -79,7 +78,7 @@ func New(tableName string, id string, secret string, token string) *Service {
 
 	localConfig := aws.NewConfig().
 		WithCredentials(creds).
-		WithEndpoint(localEndpoint).
+		WithEndpoint(dynamoAddr).
 		WithRegion(region)
 
 	svc := Service{

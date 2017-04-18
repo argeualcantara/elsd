@@ -84,8 +84,8 @@ const RoutingKeyTableName  = "routingKeys"
 
 
 // NewBasicService returns a naïve dynamoDb implementation of Service.
-func NewBasicService(tableName string, id string , secret string , token string) ElsService {
-	rk := routingkeys.New(tableName, id, secret, token)
+func NewBasicService(tableName string, dynamoAddr string, id string , secret string , token string) ElsService {
+	rk := routingkeys.New(tableName, dynamoAddr, id, secret, token)
 
 	return basicElsService{rk}
 }
