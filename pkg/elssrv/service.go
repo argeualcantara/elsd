@@ -5,8 +5,8 @@ package elssrv
 
 import (
 	"errors"
-	"github.com/galo/els-go/pkg/api"
-	"github.com/galo/els-go/pkg/dynamodb/routingkeys"
+	"github.com/hpcwp/elsd/pkg/api"
+	"github.com/hpcwp/elsd/pkg/dynamodb/routingkeys"
 	"golang.org/x/net/context"
 )
 

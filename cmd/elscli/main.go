@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/galo/els-go/pkg/api"
-	"github.com/galo/els-go/pkg/elscli"
+	"github.com/hpcwp/elsd/pkg/api"
+	"github.com/hpcwp/elsd/pkg/elscli"
 	"google.golang.org/grpc"
 	"os"
 	"time"

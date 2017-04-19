@@ -1,7 +1,7 @@
 package elssrv
 
 import (
-	"github.com/galo/els-go/pkg/api"
+	"github.com/hpcwp/elsd/pkg/api"
 	"golang.org/x/net/context"
 	"github.com/go-kit/kit/metrics"
 )

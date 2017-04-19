@@ -2,7 +2,7 @@ package elssrv
 
 import (
 	"time"
-	"github.com/galo/els-go/pkg/api"
+	"github.com/hpcwp/elsd/pkg/api"
 	"github.com/go-kit/kit/log"
 	"golang.org/x/net/context"
 )

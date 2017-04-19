@@ -2,7 +2,7 @@ package elscli
 
 import (
 	"context"
-	"github.com/galo/els-go/pkg/api"
+	"github.com/hpcwp/elsd/pkg/api"
 	"github.com/prometheus/common/log"
 )
 
