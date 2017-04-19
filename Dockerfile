@@ -7,10 +7,10 @@
 #
 FROM golang
 
-ADD . /go/src/github.com/galo/els-go
-RUN go install github.com/galo/els-go/cmd/elsd
+ADD . /go/src/github.com/hpcwp/elsd
+RUN go install github.com/hpcwp/elsd/cmd/elsd
 
-WORKDIR  /go/src/github.com/galo/els-go
+WORKDIR  /go/src/github.com/hpcwp/elsd
 
 ENTRYPOINT /go/bin/elsd
 
