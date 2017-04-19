@@ -22,7 +22,10 @@ services:
         - https_proxy
     ports:
       - "8082:8082" # gRPC
-    command: ["-dynamodb.addr http://dynamodb:8000"]
+    entrypoint:
+         - /go/bin/elsd
+         - -dynamodb.addr
+         - http://dynamodb:8000
     links:
       - dynamodb
   dynamodb:
