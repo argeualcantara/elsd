@@ -38,7 +38,7 @@ $ docker-compose up
 You can build the client, add some routing keys and get them
 
 ```
-$ go install  github.com/galo/els-go/cmd/elscli
+$ go install  github.com/hpcwp/elsd/cmd/elscli
 $ elscli -grpc.addr localhost:8082  -method Add   123 http://localhost:8072 rw
 $ elscli -grpc.addr localhost:8082  -method Add   123 http://localhost:8080 r
 $ elscli -grpc.addr localhost:8082  -method Add   124 http://localhost:8072 rw
