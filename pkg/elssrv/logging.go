@@ -1,10 +1,10 @@
 package elssrv
 
 import (
-	"time"
-	"github.com/hpcwp/elsd/pkg/api"
 	"github.com/go-kit/kit/log"
+	"github.com/hpcwp/elsd/pkg/api"
 	"golang.org/x/net/context"
+	"time"
 )
 
 type serviceLoggingMiddleware struct {

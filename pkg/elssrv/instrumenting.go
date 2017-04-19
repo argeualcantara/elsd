@@ -1,9 +1,9 @@
 package elssrv
 
 import (
+	"github.com/go-kit/kit/metrics"
 	"github.com/hpcwp/elsd/pkg/api"
 	"golang.org/x/net/context"
-	"github.com/go-kit/kit/metrics"
 )
 
 // ServiceInstrumentingMiddleware returns a service middleware that instruments
