@@ -30,7 +30,7 @@ type ServiceInstance struct {
 	Metadata string `json:"metadata"`
 }
 
-type basicElsService struct{
+type basicElsService struct {
 	rksrv *routingkeys.Service
 }
 
@@ -47,7 +47,6 @@ func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKe
 	}
 
 	serviceInstance := bs.rksrv.Get(routingKey.Id)
-
 
 	if serviceInstance == nil {
 		return nil, ErrNotFound
@@ -68,10 +67,10 @@ func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKe
 
 // The implementation of teh service
 func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceReponse, error) {
-	if addRoutingKeyRequest.ServiceUri== "" {
+	if addRoutingKeyRequest.ServiceUri == "" {
 		return &api.ServiceInstanceReponse{}, ErrInvalid
 	}
-	if addRoutingKeyRequest.RoutingKey== "" {
+	if addRoutingKeyRequest.RoutingKey == "" {
 		return &api.ServiceInstanceReponse{}, ErrNotFound
 	}
 
@@ -86,12 +85,10 @@ func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyReques
 
 }
 
-
-const RoutingKeyTableName  = "routingKeys"
-
+const RoutingKeyTableName = "routingKeys"
 
 // NewBasicService returns a naïve dynamoDb implementation of Service.
-func NewBasicService(tableName string, dynamoAddr string, id string , secret string , token string) ElsService {
+func NewBasicService(tableName string, dynamoAddr string, id string, secret string, token string) ElsService {
 	rk := routingkeys.New(tableName, dynamoAddr, id, secret, token)
 
 	return basicElsService{rk}

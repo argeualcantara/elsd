@@ -19,7 +19,6 @@ type serviceLoggingMiddleware struct {
 	next   ElsService
 }
 
-
 // ServiceLoggingMiddleware returns a service middleware that logs the
 // parameters and result of each method invocation.
 func ServiceLoggingMiddleware(logger log.Logger) Middleware {
@@ -30,7 +29,6 @@ func ServiceLoggingMiddleware(logger log.Logger) Middleware {
 		}
 	}
 }
-
 
 func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (srvIns *api.ServiceInstanceReponse, err error) {
 	defer func(begin time.Time) {
@@ -43,8 +41,7 @@ func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, 
 	return mw.next.GetServiceInstanceByKey(ctx, routingKey)
 }
 
-
-func (mw serviceLoggingMiddleware) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (srvIns *api.ServiceInstanceReponse, err error)  {
+func (mw serviceLoggingMiddleware) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (srvIns *api.ServiceInstanceReponse, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "AddRoutingKey",

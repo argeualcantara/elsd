@@ -127,7 +127,7 @@ func (s *Service) Get(id string) *Entity {
 	return s.fromDynamoToEntity(id, items)
 }
 
-func (s *Service) Add(instance *ServiceInstance) (error) {
+func (s *Service) Add(instance *ServiceInstance) error {
 	item, err := dynamodbattribute.MarshalMap(instance)
 	if err != nil {
 		log.Println("Failed to convert", err)
@@ -136,7 +136,7 @@ func (s *Service) Add(instance *ServiceInstance) (error) {
 
 	_, err = s.client.PutItem(&dynamodb.PutItemInput{
 		Item:      item,
-		TableName: aws.String( s.tableName),
+		TableName: aws.String(s.tableName),
 	})
 	if err != nil {
 		log.Println("Failed to write item", err)

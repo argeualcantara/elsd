@@ -26,9 +26,9 @@ func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.Serv
 }
 
 func AddServiceInstance(client api.ElsClient, routingKey string, uri string, tags []string) (*api.ServiceInstanceReponse, error) {
-	req := &api.AddRoutingKeyRequest{ uri, tags[0], routingKey}
-	resp, err := client.AddRoutingKey(context.Background(),req)
-	if err !=nil {
+	req := &api.AddRoutingKeyRequest{uri, tags[0], routingKey}
+	resp, err := client.AddRoutingKey(context.Background(), req)
+	if err != nil {
 		log.Fatalf("Error adding service instanve", err)
 		return nil, err
 	}

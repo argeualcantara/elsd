@@ -17,7 +17,7 @@ import (
 	"time"
 )
 
-const defaulGrpcAddres string  = "localhost:8082"
+const defaulGrpcAddres string = "localhost:8082"
 
 func main() {
 	// The elscli presumes no service discovery system, and expects users to
@@ -33,8 +33,6 @@ func main() {
 		fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method {Get|Add} <arguments> \n")
 		os.Exit(1)
 	}
-
-
 
 	conn, err := grpc.Dial(*grpcAddr, grpc.WithInsecure(), grpc.WithTimeout(time.Second))
 	if err != nil {
@@ -74,14 +72,12 @@ func main() {
 		uri := flag.Args()[1]
 		tags := flag.Args()[2]
 
-		v, err := elscli.AddServiceInstance(client,routingKey,uri, []string {tags})
+		v, err := elscli.AddServiceInstance(client, routingKey, uri, []string{tags})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)
 			os.Exit(1)
 		}
 		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
-
-
 
 	default:
 		fmt.Fprintf(os.Stderr, "error: invalid method %q\n", method)
