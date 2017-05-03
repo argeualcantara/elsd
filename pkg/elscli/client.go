@@ -9,10 +9,9 @@ package elscli
 
 import (
 	"context"
+	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	"github.com/hpcwp/elsd/pkg/api"
 	"github.com/prometheus/common/log"
-	google_protobuf "github.com/golang/protobuf/ptypes/empty"
-
 )
 
 func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.ServiceInstanceResponse, error) {
@@ -41,9 +40,9 @@ func AddServiceInstance(client api.ElsClient, routingKey string, uri string, tag
 }
 
 func RemoveServiceInstance(client api.ElsClient, routingKey string, uri string) (*google_protobuf.Empty, error) {
-	req :=&api.DeleteRoutingKeyRequest{uri,routingKey}
-	resp,err := client.RemoveRoutingKey(context.Background(),req)
-	if (err !=nil ) {
+	req := &api.DeleteRoutingKeyRequest{uri, routingKey}
+	resp, err := client.RemoveRoutingKey(context.Background(), req)
+	if err != nil {
 		log.Fatalf("Error deleting routing key ", err)
 		return nil, err
 	}

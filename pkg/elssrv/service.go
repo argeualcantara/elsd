@@ -12,10 +12,10 @@ package elssrv
 
 import (
 	"errors"
+	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	"github.com/hpcwp/elsd/pkg/api"
 	"github.com/hpcwp/elsd/pkg/dynamodb/routingkeys"
 	"golang.org/x/net/context"
-	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 )
 
 // Service describes a service that adds things together.
@@ -41,7 +41,7 @@ type basicElsService struct {
 // Errors
 var (
 	// ErrEmpty is returned when input is invalid
-	ErrInvalid = errors.New("invalid routing key")
+	ErrInvalid  = errors.New("invalid routing key")
 	ErrNotFound = errors.New("service instance not found ")
 )
 
@@ -91,9 +91,8 @@ func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyReques
 
 }
 
-
 // Delete a routingKey to a service
-func (bs basicElsService)  RemoveRoutingKey(ctx context.Context, req *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error) {
+func (bs basicElsService) RemoveRoutingKey(ctx context.Context, req *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error) {
 	if req.ServiceUri == "" {
 		return &google_protobuf.Empty{}, ErrInvalid
 	}
@@ -106,7 +105,6 @@ func (bs basicElsService)  RemoveRoutingKey(ctx context.Context, req *api.Delete
 	return &google_protobuf.Empty{}, err
 }
 
-
 const RoutingKeyTableName = "routingKeys"
 
 // NewBasicService returns a naïve dynamoDb implementation of Service.
@@ -118,5 +116,3 @@ func NewBasicService(tableName string, dynamoAddr string, id string, secret stri
 
 // Middleware describes a service (as opposed to endpoint) middleware.
 type Middleware func(ElsService) ElsService
-
-
