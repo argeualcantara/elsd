@@ -45,7 +45,7 @@ func (mw serviceInstrumentingMiddleware) AddRoutingKey(ctx context.Context, addR
 
 func (mw serviceInstrumentingMiddleware) RemoveRoutingKey(ctx context.Context, req *api.DeleteRoutingKeyRequest) (empty *google_protobuf.Empty, err error) {
 	v, err := mw.next.RemoveRoutingKey(ctx, req)
-	mw.ints.Add(-1)
+	mw.ints.Add(1)
 	return v, err
 
 }

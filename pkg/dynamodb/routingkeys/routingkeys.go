@@ -149,7 +149,7 @@ func (s *Service) Remove(uri string, routingKey string) error {
 
 	key := map[string] *dynamodb.AttributeValue{
 		"Id":  { S: aws.String(routingKey) },
-		"uri": {S: aws.String(uri) },
+		"Uri": {S: aws.String(uri) },
 	}
 
 	input := &dynamodb.DeleteItemInput{

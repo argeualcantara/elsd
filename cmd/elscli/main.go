@@ -79,6 +79,22 @@ func main() {
 		}
 		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
 
+	case "Remove":
+		if len(flag.Args()) != 2 {
+			fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Remove routing-key uri \n")
+			os.Exit(1)
+		}
+		routingKey := flag.Args()[0]
+		uri := flag.Args()[1]
+
+		v, err := elscli.RemoveServiceInstance(client,routingKey,uri)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+
+
 	default:
 		fmt.Fprintf(os.Stderr, "error: invalid method %q\n", method)
 		os.Exit(1)
