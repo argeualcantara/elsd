@@ -145,6 +145,28 @@ func (s *Service) Add(instance *ServiceInstance) error {
 	return nil
 }
 
+func (s *Service) Remove(uri string, routingKey string) error {
+
+	key := map[string]*dynamodb.AttributeValue{
+		"Id":  {S: aws.String(routingKey)},
+		"Uri": {S: aws.String(uri)},
+	}
+
+	input := &dynamodb.DeleteItemInput{
+		TableName: aws.String(s.tableName),
+		Key:       key,
+	}
+
+	_, err := s.client.DeleteItem(input)
+
+	if err != nil {
+		log.Println("Failed to remove item", err)
+		return err
+	}
+	return nil
+
+}
+
 func (s *Service) fromDynamoToEntity(id string, input *dynamodb.QueryOutput) *Entity {
 	length := len(input.Items)
 	if length == 0 {

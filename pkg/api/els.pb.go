@@ -10,14 +10,16 @@ It is generated from these files:
 
 It has these top-level messages:
 	RoutingKeyRequest
-	ServiceInstanceReponse
+	ServiceInstanceResponse
 	AddRoutingKeyRequest
+	DeleteRoutingKeyRequest
 */
 package api
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
+import google_protobuf "github.com/golang/protobuf/ptypes/empty"
 
 import (
 	context "golang.org/x/net/context"
@@ -51,24 +53,24 @@ func (m *RoutingKeyRequest) GetId() string {
 	return ""
 }
 
-type ServiceInstanceReponse struct {
+type ServiceInstanceResponse struct {
 	ServiceUri string `protobuf:"bytes,1,opt,name=serviceUri" json:"serviceUri,omitempty"`
 	Tags       string `protobuf:"bytes,2,opt,name=tags" json:"tags,omitempty"`
 }
 
-func (m *ServiceInstanceReponse) Reset()                    { *m = ServiceInstanceReponse{} }
-func (m *ServiceInstanceReponse) String() string            { return proto.CompactTextString(m) }
-func (*ServiceInstanceReponse) ProtoMessage()               {}
-func (*ServiceInstanceReponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (m *ServiceInstanceResponse) Reset()                    { *m = ServiceInstanceResponse{} }
+func (m *ServiceInstanceResponse) String() string            { return proto.CompactTextString(m) }
+func (*ServiceInstanceResponse) ProtoMessage()               {}
+func (*ServiceInstanceResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *ServiceInstanceReponse) GetServiceUri() string {
+func (m *ServiceInstanceResponse) GetServiceUri() string {
 	if m != nil {
 		return m.ServiceUri
 	}
 	return ""
 }
 
-func (m *ServiceInstanceReponse) GetTags() string {
+func (m *ServiceInstanceResponse) GetTags() string {
 	if m != nil {
 		return m.Tags
 	}
@@ -107,10 +109,35 @@ func (m *AddRoutingKeyRequest) GetRoutingKey() string {
 	return ""
 }
 
+type DeleteRoutingKeyRequest struct {
+	ServiceUri string `protobuf:"bytes,1,opt,name=serviceUri" json:"serviceUri,omitempty"`
+	RoutingKey string `protobuf:"bytes,3,opt,name=routingKey" json:"routingKey,omitempty"`
+}
+
+func (m *DeleteRoutingKeyRequest) Reset()                    { *m = DeleteRoutingKeyRequest{} }
+func (m *DeleteRoutingKeyRequest) String() string            { return proto.CompactTextString(m) }
+func (*DeleteRoutingKeyRequest) ProtoMessage()               {}
+func (*DeleteRoutingKeyRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+
+func (m *DeleteRoutingKeyRequest) GetServiceUri() string {
+	if m != nil {
+		return m.ServiceUri
+	}
+	return ""
+}
+
+func (m *DeleteRoutingKeyRequest) GetRoutingKey() string {
+	if m != nil {
+		return m.RoutingKey
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*RoutingKeyRequest)(nil), "api.RoutingKeyRequest")
-	proto.RegisterType((*ServiceInstanceReponse)(nil), "api.ServiceInstanceReponse")
+	proto.RegisterType((*ServiceInstanceResponse)(nil), "api.ServiceInstanceResponse")
 	proto.RegisterType((*AddRoutingKeyRequest)(nil), "api.AddRoutingKeyRequest")
+	proto.RegisterType((*DeleteRoutingKeyRequest)(nil), "api.DeleteRoutingKeyRequest")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -125,9 +152,11 @@ const _ = grpc.SupportPackageIsVersion4
 
 type ElsClient interface {
 	// Get a service by routingKey
-	GetServiceInstanceByKey(ctx context.Context, in *RoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceReponse, error)
+	GetServiceInstanceByKey(ctx context.Context, in *RoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceResponse, error)
 	// Add a routingKey to a service
-	AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceReponse, error)
+	AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceResponse, error)
+	// Add a routingKey to a service
+	RemoveRoutingKey(ctx context.Context, in *DeleteRoutingKeyRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error)
 }
 
 type elsClient struct {
@@ -138,8 +167,8 @@ func NewElsClient(cc *grpc.ClientConn) ElsClient {
 	return &elsClient{cc}
 }
 
-func (c *elsClient) GetServiceInstanceByKey(ctx context.Context, in *RoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceReponse, error) {
-	out := new(ServiceInstanceReponse)
+func (c *elsClient) GetServiceInstanceByKey(ctx context.Context, in *RoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceResponse, error) {
+	out := new(ServiceInstanceResponse)
 	err := grpc.Invoke(ctx, "/api.Els/GetServiceInstanceByKey", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -147,9 +176,18 @@ func (c *elsClient) GetServiceInstanceByKey(ctx context.Context, in *RoutingKeyR
 	return out, nil
 }
 
-func (c *elsClient) AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceReponse, error) {
-	out := new(ServiceInstanceReponse)
+func (c *elsClient) AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest, opts ...grpc.CallOption) (*ServiceInstanceResponse, error) {
+	out := new(ServiceInstanceResponse)
 	err := grpc.Invoke(ctx, "/api.Els/AddRoutingKey", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *elsClient) RemoveRoutingKey(ctx context.Context, in *DeleteRoutingKeyRequest, opts ...grpc.CallOption) (*google_protobuf.Empty, error) {
+	out := new(google_protobuf.Empty)
+	err := grpc.Invoke(ctx, "/api.Els/RemoveRoutingKey", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -160,9 +198,11 @@ func (c *elsClient) AddRoutingKey(ctx context.Context, in *AddRoutingKeyRequest,
 
 type ElsServer interface {
 	// Get a service by routingKey
-	GetServiceInstanceByKey(context.Context, *RoutingKeyRequest) (*ServiceInstanceReponse, error)
+	GetServiceInstanceByKey(context.Context, *RoutingKeyRequest) (*ServiceInstanceResponse, error)
 	// Add a routingKey to a service
-	AddRoutingKey(context.Context, *AddRoutingKeyRequest) (*ServiceInstanceReponse, error)
+	AddRoutingKey(context.Context, *AddRoutingKeyRequest) (*ServiceInstanceResponse, error)
+	// Add a routingKey to a service
+	RemoveRoutingKey(context.Context, *DeleteRoutingKeyRequest) (*google_protobuf.Empty, error)
 }
 
 func RegisterElsServer(s *grpc.Server, srv ElsServer) {
@@ -205,6 +245,24 @@ func _Els_AddRoutingKey_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Els_RemoveRoutingKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRoutingKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ElsServer).RemoveRoutingKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Els/RemoveRoutingKey",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ElsServer).RemoveRoutingKey(ctx, req.(*DeleteRoutingKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Els_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "api.Els",
 	HandlerType: (*ElsServer)(nil),
@@ -217,6 +275,10 @@ var _Els_serviceDesc = grpc.ServiceDesc{
 			MethodName: "AddRoutingKey",
 			Handler:    _Els_AddRoutingKey_Handler,
 		},
+		{
+			MethodName: "RemoveRoutingKey",
+			Handler:    _Els_RemoveRoutingKey_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "els.proto",
@@ -225,19 +287,23 @@ var _Els_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("els.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 214 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4c, 0xcd, 0x29, 0xd6,
-	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x4e, 0x2c, 0xc8, 0x54, 0x52, 0xe6, 0x12, 0x0c, 0xca,
-	0x2f, 0x2d, 0xc9, 0xcc, 0x4b, 0xf7, 0x4e, 0xad, 0x0c, 0x4a, 0x2d, 0x2c, 0x4d, 0x2d, 0x2e, 0x11,
-	0xe2, 0xe3, 0x62, 0xca, 0x4c, 0x91, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x0c, 0x62, 0xca, 0x4c, 0x51,
-	0xf2, 0xe1, 0x12, 0x0b, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c, 0x4e, 0xf5, 0xcc, 0x2b, 0x2e, 0x49, 0xcc,
-	0x4b, 0x4e, 0x0d, 0x4a, 0x2d, 0xc8, 0xcf, 0x2b, 0x4e, 0x15, 0x92, 0xe3, 0xe2, 0x2a, 0x86, 0xc8,
-	0x84, 0x16, 0x65, 0x42, 0x75, 0x20, 0x89, 0x08, 0x09, 0x71, 0xb1, 0x94, 0x24, 0xa6, 0x17, 0x4b,
-	0x30, 0x81, 0x65, 0xc0, 0x6c, 0xa5, 0x2c, 0x2e, 0x11, 0xc7, 0x94, 0x14, 0x4c, 0x5b, 0xc9, 0x30,
-	0x0b, 0xa4, 0xa7, 0x08, 0x6e, 0x90, 0x04, 0x33, 0x44, 0x0f, 0x42, 0xc4, 0x68, 0x11, 0x23, 0x17,
-	0xb3, 0x6b, 0x4e, 0xb1, 0x50, 0x00, 0x97, 0xb8, 0x7b, 0x6a, 0x09, 0x9a, 0x27, 0x9c, 0x2a, 0xbd,
-	0x53, 0x2b, 0x85, 0xc4, 0xf4, 0x12, 0x0b, 0x32, 0xf5, 0x30, 0x9c, 0x23, 0x25, 0x0d, 0x16, 0xc7,
-	0xee, 0x6f, 0x25, 0x06, 0x21, 0x4f, 0x2e, 0x5e, 0x14, 0x5f, 0x08, 0x49, 0x82, 0xd5, 0x63, 0xf3,
-	0x19, 0x01, 0xa3, 0x92, 0xd8, 0xc0, 0xf1, 0x61, 0x0c, 0x08, 0x00, 0x00, 0xff, 0xff, 0x97, 0xd9,
-	0x5c, 0xa2, 0x9c, 0x01, 0x00, 0x00,
+	// 277 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x92, 0x5f, 0x4b, 0xc3, 0x30,
+	0x14, 0xc5, 0xd7, 0x56, 0x84, 0x5d, 0x50, 0xf4, 0x22, 0x6b, 0xad, 0x22, 0x12, 0x5f, 0x7c, 0xca,
+	0x40, 0x3f, 0x81, 0xe2, 0x10, 0x1d, 0x3e, 0x18, 0xf1, 0xc1, 0xc7, 0x6e, 0xbd, 0x96, 0x48, 0xd7,
+	0xc4, 0x26, 0x1d, 0xf4, 0x5b, 0xfb, 0x11, 0x64, 0x89, 0x7f, 0xa6, 0x73, 0xa8, 0x7b, 0x0b, 0xe7,
+	0xe6, 0x9c, 0x03, 0x3f, 0x0e, 0x74, 0xa9, 0x34, 0x5c, 0xd7, 0xca, 0x2a, 0x8c, 0x32, 0x2d, 0xd3,
+	0xbd, 0x42, 0xa9, 0xa2, 0xa4, 0xbe, 0x93, 0x46, 0xcd, 0x63, 0x9f, 0x26, 0xda, 0xb6, 0xfe, 0x07,
+	0x3b, 0x82, 0x6d, 0xa1, 0x1a, 0x2b, 0xab, 0x62, 0x48, 0xad, 0xa0, 0xe7, 0x86, 0x8c, 0xc5, 0x4d,
+	0x08, 0x65, 0x9e, 0x04, 0x87, 0xc1, 0x71, 0x57, 0x84, 0x32, 0x67, 0x37, 0x10, 0xdf, 0x51, 0x3d,
+	0x95, 0x63, 0xba, 0xaa, 0x8c, 0xcd, 0xaa, 0x31, 0x09, 0x32, 0x5a, 0x55, 0x86, 0xf0, 0x00, 0xc0,
+	0xf8, 0xd3, 0x7d, 0x2d, 0xdf, 0x2c, 0x73, 0x0a, 0x22, 0xac, 0xd9, 0xac, 0x30, 0x49, 0xe8, 0x2e,
+	0xee, 0xcd, 0x9e, 0x60, 0xe7, 0x2c, 0xcf, 0x17, 0x6b, 0x57, 0xc8, 0x9a, 0x79, 0xea, 0x8f, 0xa0,
+	0x24, 0xf2, 0x9e, 0x4f, 0x85, 0x3d, 0x40, 0x7c, 0x41, 0x25, 0x59, 0xfa, 0x7f, 0xdd, 0x2f, 0xd1,
+	0x27, 0x2f, 0x01, 0x44, 0x83, 0xd2, 0xe0, 0x2d, 0xc4, 0x97, 0x64, 0xbf, 0x01, 0x3a, 0x6f, 0x87,
+	0xd4, 0x62, 0x8f, 0x67, 0x5a, 0xf2, 0x85, 0xea, 0x74, 0xdf, 0xe9, 0x4b, 0x98, 0xb2, 0x0e, 0x5e,
+	0xc3, 0xc6, 0x17, 0x42, 0xb8, 0xeb, 0x0c, 0x3f, 0x51, 0xfb, 0x43, 0xd6, 0x96, 0xa0, 0x89, 0x9a,
+	0xce, 0x11, 0x40, 0xef, 0x59, 0x02, 0x26, 0xed, 0x71, 0xbf, 0x18, 0xfe, 0xbe, 0x18, 0x3e, 0x98,
+	0x2d, 0x86, 0x75, 0x46, 0xeb, 0x4e, 0x39, 0x7d, 0x0d, 0x00, 0x00, 0xff, 0xff, 0xeb, 0x00, 0x4c,
+	0xc1, 0x63, 0x02, 0x00, 0x00,
 }

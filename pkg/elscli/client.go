@@ -9,11 +9,12 @@ package elscli
 
 import (
 	"context"
+	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	"github.com/hpcwp/elsd/pkg/api"
 	"github.com/prometheus/common/log"
 )
 
-func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.ServiceInstanceReponse, error) {
+func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.ServiceInstanceResponse, error) {
 	req := &api.RoutingKeyRequest{routingKey}
 	resp, err := client.GetServiceInstanceByKey(context.Background(), req)
 	if err != nil {
@@ -25,15 +26,26 @@ func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.Serv
 	return resp, nil
 }
 
-func AddServiceInstance(client api.ElsClient, routingKey string, uri string, tags []string) (*api.ServiceInstanceReponse, error) {
+func AddServiceInstance(client api.ElsClient, routingKey string, uri string, tags []string) (*api.ServiceInstanceResponse, error) {
 	req := &api.AddRoutingKeyRequest{uri, tags[0], routingKey}
 	resp, err := client.AddRoutingKey(context.Background(), req)
 	if err != nil {
-		log.Fatalf("Error adding service instanve", err)
+		log.Fatalf("Error adding service instance", err)
 		return nil, err
 	}
 
 	log.Info("ServiceInstnace added", resp.GetServiceUri(), resp.GetTags())
 	return resp, nil
 
+}
+
+func RemoveServiceInstance(client api.ElsClient, routingKey string, uri string) (*google_protobuf.Empty, error) {
+	req := &api.DeleteRoutingKeyRequest{uri, routingKey}
+	resp, err := client.RemoveRoutingKey(context.Background(), req)
+	if err != nil {
+		log.Fatalf("Error deleting routing key ", err)
+		return nil, err
+	}
+	log.Info("RoutingKey deleted")
+	return resp, nil
 }

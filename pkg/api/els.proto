@@ -8,18 +8,25 @@
 
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 
 package api;
 
 // The els service definitio
 service Els {
     // Get a service by routingKey
-    rpc GetServiceInstanceByKey (RoutingKeyRequest) returns (ServiceInstanceReponse) {
+    rpc GetServiceInstanceByKey (RoutingKeyRequest) returns (ServiceInstanceResponse) {
     }
 
     // Add a routingKey to a service
-    rpc AddRoutingKey (AddRoutingKeyRequest) returns (ServiceInstanceReponse){
+    rpc AddRoutingKey (AddRoutingKeyRequest) returns (ServiceInstanceResponse) {
     }
+
+    // Add a routingKey to a service
+    rpc RemoveRoutingKey (DeleteRoutingKeyRequest) returns (google.protobuf.Empty) {
+    }
+
 }
 
 message RoutingKeyRequest {
@@ -27,7 +34,7 @@ message RoutingKeyRequest {
 }
 
 
-message ServiceInstanceReponse {
+message ServiceInstanceResponse {
     string serviceUri = 1;
     string tags = 2;
 }
@@ -36,5 +43,10 @@ message ServiceInstanceReponse {
 message AddRoutingKeyRequest {
     string serviceUri = 1;
     string tags = 2;
+    string routingKey = 3;
+}
+
+message DeleteRoutingKeyRequest {
+    string serviceUri = 1;
     string routingKey = 3;
 }

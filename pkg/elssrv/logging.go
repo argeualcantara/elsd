@@ -9,6 +9,7 @@ package elssrv
 
 import (
 	"github.com/go-kit/kit/log"
+	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	"github.com/hpcwp/elsd/pkg/api"
 	"golang.org/x/net/context"
 	"time"
@@ -30,7 +31,7 @@ func ServiceLoggingMiddleware(logger log.Logger) Middleware {
 	}
 }
 
-func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (srvIns *api.ServiceInstanceReponse, err error) {
+func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (srvIns *api.ServiceInstanceResponse, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "GetServiceInstance",
@@ -41,7 +42,7 @@ func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, 
 	return mw.next.GetServiceInstanceByKey(ctx, routingKey)
 }
 
-func (mw serviceLoggingMiddleware) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (srvIns *api.ServiceInstanceReponse, err error) {
+func (mw serviceLoggingMiddleware) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (srvIns *api.ServiceInstanceResponse, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "AddRoutingKey",
@@ -50,4 +51,16 @@ func (mw serviceLoggingMiddleware) AddRoutingKey(ctx context.Context, addRouting
 		)
 	}(time.Now())
 	return mw.next.AddRoutingKey(ctx, addRoutingKeyRequest)
+}
+
+func (mw serviceLoggingMiddleware) RemoveRoutingKey(ctx context.Context, req *api.DeleteRoutingKeyRequest) (empty *google_protobuf.Empty, err error) {
+	defer func(begin time.Time) {
+		mw.logger.Log(
+			"method", "RemoveRoutingKey",
+			"serviceUri", req.ServiceUri, "routingKey", req.RoutingKey, "error", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+	return mw.next.RemoveRoutingKey(ctx, req)
+
 }
