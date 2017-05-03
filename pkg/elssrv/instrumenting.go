@@ -9,9 +9,15 @@ package elssrv
 
 import (
 	"github.com/go-kit/kit/metrics"
+	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	"github.com/hpcwp/elsd/pkg/api"
 	"golang.org/x/net/context"
 )
+
+type serviceInstrumentingMiddleware struct {
+	ints metrics.Counter
+	next ElsService
+}
 
 // ServiceInstrumentingMiddleware returns a service middleware that instruments
 // the number of routingKeys accessed over the lifetime of
@@ -25,19 +31,21 @@ func ServiceInstrumentingMiddleware(ints metrics.Counter) Middleware {
 	}
 }
 
-type serviceInstrumentingMiddleware struct {
-	ints metrics.Counter
-	next ElsService
-}
-
-func (mw serviceInstrumentingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceReponse, error) {
+func (mw serviceInstrumentingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
 	v, err := mw.next.GetServiceInstanceByKey(ctx, routingKey)
 	mw.ints.Add(1)
 	return v, err
 }
 
-func (mw serviceInstrumentingMiddleware) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceReponse, error) {
+func (mw serviceInstrumentingMiddleware) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
 	v, err := mw.next.AddRoutingKey(ctx, addRoutingKeyRequest)
 	mw.ints.Add(1)
 	return v, err
+}
+
+func (mw serviceInstrumentingMiddleware) RemoveRoutingKey(ctx context.Context, req *api.DeleteRoutingKeyRequest) (empty *google_protobuf.Empty, err error) {
+	v, err := mw.next.RemoveRoutingKey(ctx, req)
+	mw.ints.Add(-1)
+	return v, err
+
 }

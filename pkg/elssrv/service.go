@@ -15,14 +15,18 @@ import (
 	"github.com/hpcwp/elsd/pkg/api"
 	"github.com/hpcwp/elsd/pkg/dynamodb/routingkeys"
 	"golang.org/x/net/context"
+	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 )
 
 // Service describes a service that adds things together.
 type ElsService interface {
-	GetServiceInstanceByKey(ctx context.Context, request *api.RoutingKeyRequest) (*api.ServiceInstanceReponse, error)
+	GetServiceInstanceByKey(ctx context.Context, request *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error)
 
 	// Add a routingKey to a service
-	AddRoutingKey(context.Context, *api.AddRoutingKeyRequest) (*api.ServiceInstanceReponse, error)
+	AddRoutingKey(context.Context, *api.AddRoutingKeyRequest) (*api.ServiceInstanceResponse, error)
+
+	// Delete a routingKey to a service
+	RemoveRoutingKey(context.Context, request *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error)
 }
 
 type ServiceInstance struct {
@@ -36,14 +40,16 @@ type basicElsService struct {
 
 // Errors
 var (
-	ErrNotFound = errors.New("ServiceInstance not found ")
+	// ErrEmpty is returned when input is invalid
+	ErrInvalid = errors.New("invalid routing key")
+	ErrNotFound = errors.New("service instance not found ")
 )
 
 // The implementation of the service
-func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceReponse, error) {
+func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
 
 	if routingKey.Id == "" {
-		return &api.ServiceInstanceReponse{}, ErrInvalid
+		return &api.ServiceInstanceResponse{}, ErrInvalid
 	}
 
 	serviceInstance := bs.rksrv.Get(routingKey.Id)
@@ -61,17 +67,17 @@ func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKe
 		return nil, ErrNotFound
 	}
 
-	srvInstance := api.ServiceInstanceReponse{serviceUrl, "rw"}
+	srvInstance := api.ServiceInstanceResponse{serviceUrl, "rw"}
 	return &srvInstance, nil
 }
 
-// The implementation of teh service
-func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceReponse, error) {
+// The implementation of the service
+func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
 	if addRoutingKeyRequest.ServiceUri == "" {
-		return &api.ServiceInstanceReponse{}, ErrInvalid
+		return &api.ServiceInstanceResponse{}, ErrInvalid
 	}
 	if addRoutingKeyRequest.RoutingKey == "" {
-		return &api.ServiceInstanceReponse{}, ErrNotFound
+		return &api.ServiceInstanceResponse{}, ErrNotFound
 	}
 
 	instance := &routingkeys.ServiceInstance{addRoutingKeyRequest.RoutingKey,
@@ -80,10 +86,25 @@ func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyReques
 
 	bs.rksrv.Add(instance)
 
-	return &api.ServiceInstanceReponse{instance.Uri,
+	return &api.ServiceInstanceResponse{instance.Uri,
 		instance.Tags[0]}, nil
 
 }
+
+
+// Delete a routingKey to a service
+func (bs basicElsService)  RemoveRoutingKey(ctx context.Context, req *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error) {
+	if req.ServiceUri == "" {
+		return &google_protobuf.Empty{}, ErrInvalid
+	}
+	if req.RoutingKey == "" {
+		return &google_protobuf.Empty{}, ErrInvalid
+	}
+
+	err := bs.rksrv.Remove(req.ServiceUri, req.RoutingKey)
+
+}	return &google_protobuf.Empty{}, err
+
 
 const RoutingKeyTableName = "routingKeys"
 
@@ -97,5 +118,4 @@ func NewBasicService(tableName string, dynamoAddr string, id string, secret stri
 // Middleware describes a service (as opposed to endpoint) middleware.
 type Middleware func(ElsService) ElsService
 
-// ErrEmpty is returned when input is invalid
-var ErrInvalid = errors.New("Invalid routing key")
+

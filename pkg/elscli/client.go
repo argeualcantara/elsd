@@ -13,7 +13,7 @@ import (
 	"github.com/prometheus/common/log"
 )
 
-func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.ServiceInstanceReponse, error) {
+func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.ServiceInstanceResponse, error) {
 	req := &api.RoutingKeyRequest{routingKey}
 	resp, err := client.GetServiceInstanceByKey(context.Background(), req)
 	if err != nil {
@@ -25,7 +25,7 @@ func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.Serv
 	return resp, nil
 }
 
-func AddServiceInstance(client api.ElsClient, routingKey string, uri string, tags []string) (*api.ServiceInstanceReponse, error) {
+func AddServiceInstance(client api.ElsClient, routingKey string, uri string, tags []string) (*api.ServiceInstanceResponse, error) {
 	req := &api.AddRoutingKeyRequest{uri, tags[0], routingKey}
 	resp, err := client.AddRoutingKey(context.Background(), req)
 	if err != nil {
