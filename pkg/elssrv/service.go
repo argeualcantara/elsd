@@ -26,7 +26,7 @@ type ElsService interface {
 	AddRoutingKey(context.Context, *api.AddRoutingKeyRequest) (*api.ServiceInstanceResponse, error)
 
 	// Delete a routingKey to a service
-	RemoveRoutingKey(context.Context, request *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error)
+	RemoveRoutingKey(context.Context, *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error)
 }
 
 type ServiceInstance struct {
@@ -103,7 +103,8 @@ func (bs basicElsService)  RemoveRoutingKey(ctx context.Context, req *api.Delete
 
 	err := bs.rksrv.Remove(req.ServiceUri, req.RoutingKey)
 
-}	return &google_protobuf.Empty{}, err
+	return &google_protobuf.Empty{}, err
+}
 
 
 const RoutingKeyTableName = "routingKeys"
