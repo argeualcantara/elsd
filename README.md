@@ -49,6 +49,11 @@ $ elscli -grpc.addr localhost:8082  -method Add   125 http://localhost:8080 rw
 $ elscli -grpc.addr localhost:8082  -method Get   125
 ```
 
+## Prometheus Metrics
+
+```
+http://localhost:8080/metrics
+```
 
 ## Using AWS CLI 
 
