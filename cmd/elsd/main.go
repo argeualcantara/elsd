@@ -10,6 +10,15 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net"
+	"net/http"
+	"net/http/pprof"
+	"os"
+	"os/signal"
+	"runtime"
+	"strings"
+	"syscall"
+
 	"github.com/dimiro1/banner"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics"
@@ -19,14 +28,6 @@ import (
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
-	"net"
-	"net/http"
-	"net/http/pprof"
-	"os"
-	"os/signal"
-	"runtime"
-	"strings"
-	"syscall"
 )
 
 const (
@@ -92,13 +93,13 @@ func main() {
 	logger.Log("debugAddr", debugAddr, "grpcAddr", grpcAddr, "dynamodbAddr", dynamoDbAddr)
 
 	// Metrics domain.
-	var ints metrics.Counter
+	var keys metrics.Counter
 	{
 		// Business level metrics.
-		ints = prometheus.NewCounterFrom(stdprometheus.CounterOpts{
-			Namespace: "addsvc",
-			Name:      "integers_summed",
-			Help:      "Total count of integers summed via the Sum method.",
+		keys = prometheus.NewCounterFrom(stdprometheus.CounterOpts{
+			Namespace: "elds",
+			Name:      "keys_added",
+			Help:      "Total keys added.",
 		}, []string{})
 	}
 
@@ -107,7 +108,7 @@ func main() {
 	{
 		service = elssrv.NewBasicService(elssrv.RoutingKeyTableName, *dynamoDbAddr, *id, *secret, *token)
 		service = elssrv.ServiceLoggingMiddleware(logger)(service)
-		service = elssrv.ServiceInstrumentingMiddleware(ints)(service)
+		service = elssrv.ServiceInstrumentingMiddleware(keys)(service)
 	}
 
 	// Mechanical domain.
