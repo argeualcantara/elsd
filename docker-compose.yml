@@ -22,6 +22,7 @@ services:
         - https_proxy
     ports:
       - "8082:8082" # gRPC
+      - "8080:8080" # http
     entrypoint:
          - /go/bin/elsd
          - -dynamodb.addr
