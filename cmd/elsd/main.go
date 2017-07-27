@@ -71,7 +71,7 @@ func main() {
 	var (
 		debugAddr    = flag.String("debug.addr", ":8080", "Debug and metrics listen address")
 		grpcAddr     = flag.String("grpc.addr", ":8082", "gRPC (HTTP) listen address")
-		dynamoDbAddr = flag.String("dynamodb.addr", "http://localhost:8080", "DynamoDb (HTTP) address")
+		dynamoDbAddr = flag.String("dynamodb.addr", "http://localhost:8000", "DynamoDb (HTTP) address")
 		id           = flag.String("aws.id", "123", "AWS id")
 		secret       = flag.String("aws.secret", "123", "AWS secret")
 		token        = flag.String("aws.token", "", "AWS token")
