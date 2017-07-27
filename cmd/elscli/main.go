@@ -25,7 +25,7 @@ func main() {
 
 	var (
 		grpcAddr = flag.String("grpc.addr", "", "gRPC (HTTP) address of elssvc")
-		method   = flag.String("method", "Get, Add", "Get routingKey, Add routingKey uri tags")
+		method   = flag.String("method", "Get, Add, Remove", "Get routingKey, Add routingKey uri tags")
 	)
 	flag.Parse()
 

@@ -92,14 +92,27 @@ func main() {
 
 	logger.Log("debugAddr", debugAddr, "grpcAddr", grpcAddr, "dynamodbAddr", dynamoDbAddr)
 
-	// Metrics domain.
-	var keys metrics.Counter
+
+	// Queries domain.
+	var queries metrics.Counter
 	{
 		// Business level metrics.
-		keys = prometheus.NewCounterFrom(stdprometheus.CounterOpts{
+		queries = prometheus.NewCounterFrom(stdprometheus.CounterOpts{
 			Namespace: "elds",
-			Name:      "keys_added",
-			Help:      "Total keys added.",
+			Name:      "queries",
+			Help:      "Total queries.",
+		}, []string{})
+	}
+
+
+	// Metrics domain.
+	var keys metrics.Gauge
+	{
+		// Business level metrics.
+		keys = prometheus.NewGaugeFrom(stdprometheus.GaugeOpts{
+			Namespace: "elds",
+			Name:      "keys",
+			Help:      "Keys stored.",
 		}, []string{})
 	}
 
@@ -108,7 +121,7 @@ func main() {
 	{
 		service = elssrv.NewBasicService(elssrv.RoutingKeyTableName, *dynamoDbAddr, *id, *secret, *token)
 		service = elssrv.ServiceLoggingMiddleware(logger)(service)
-		service = elssrv.ServiceInstrumentingMiddleware(keys)(service)
+		service = elssrv.ServiceInstrumentingMiddleware(keys, queries)(service)
 	}
 
 	// Mechanical domain.
