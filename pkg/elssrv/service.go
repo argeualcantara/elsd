@@ -20,7 +20,11 @@ import (
 
 // Service describes a service that adds things together.
 type ElsService interface {
+	// Get a service instance by key - will randomly get one if multiple instances are registered for that eky
 	GetServiceInstanceByKey(ctx context.Context, request *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error)
+
+	// List all services
+	ListServiceInstances(ctx context.Context, request *api.RoutingKeyRequest) (*api.ServiceInstanceListResponse, error)
 
 	// Add a routingKey to a service
 	AddRoutingKey(context.Context, *api.AddRoutingKeyRequest) (*api.ServiceInstanceResponse, error)
@@ -44,6 +48,32 @@ var (
 	ErrInvalid  = errors.New("invalid routing key")
 	ErrNotFound = errors.New("service instance not found ")
 )
+
+func (bs basicElsService) ListServiceInstances(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceListResponse, error) {
+
+	if routingKey.Id == "" {
+		return &api.ServiceInstanceListResponse{}, ErrInvalid
+	}
+
+	entities := bs.rksrv.Get(routingKey.Id)
+
+	if entities == nil {
+		return nil, ErrNotFound
+	}
+	if len(entities.ServiceInstances) == 0 {
+		return nil, ErrNotFound
+	}
+
+	var listResp api.ServiceInstanceListResponse
+
+	for i := range entities.ServiceInstances {
+
+		srvInstance := api.ServiceInstanceResponse{ServiceUri: entities.ServiceInstances[i].Uri, Tags: "rw"}
+		listResp.ServiceInstances = append(listResp.ServiceInstances, &srvInstance)
+
+	}
+	return &listResp, nil
+}
 
 // The implementation of the service
 func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error) {

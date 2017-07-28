@@ -15,9 +15,9 @@ import (
 )
 
 type serviceInstrumentingMiddleware struct {
-	keys metrics.Gauge
+	keys    metrics.Gauge
 	queries metrics.Counter
-	next ElsService
+	next    ElsService
 }
 
 // ServiceInstrumentingMiddleware returns a service middleware that instruments
@@ -26,15 +26,21 @@ type serviceInstrumentingMiddleware struct {
 func ServiceInstrumentingMiddleware(keys metrics.Gauge, queries metrics.Counter) Middleware {
 	return func(next ElsService) ElsService {
 		return serviceInstrumentingMiddleware{
-			keys: keys,
+			keys:    keys,
 			queries: queries,
-			next: next,
+			next:    next,
 		}
 	}
 }
 
 func (mw serviceInstrumentingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
 	v, err := mw.next.GetServiceInstanceByKey(ctx, routingKey)
+	mw.queries.Add(1)
+	return v, err
+}
+
+func (mw serviceInstrumentingMiddleware) ListServiceInstances(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceListResponse, error) {
+	v, err := mw.next.ListServiceInstances(ctx, routingKey)
 	mw.queries.Add(1)
 	return v, err
 }

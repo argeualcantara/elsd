@@ -34,12 +34,23 @@ func ServiceLoggingMiddleware(logger log.Logger) Middleware {
 func (mw serviceLoggingMiddleware) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (srvIns *api.ServiceInstanceResponse, err error) {
 	defer func(begin time.Time) {
 		mw.logger.Log(
-			"method", "GetServiceInstance",
+			"method", "GetServiceInstanceByKey",
 			"routingKey", routingKey, "result", srvIns, "error", err,
 			"took", time.Since(begin),
 		)
 	}(time.Now())
 	return mw.next.GetServiceInstanceByKey(ctx, routingKey)
+}
+
+func (mw serviceLoggingMiddleware) ListServiceInstances(ctx context.Context, routingKey *api.RoutingKeyRequest) (srvIns *api.ServiceInstanceListResponse, err error) {
+	defer func(begin time.Time) {
+		mw.logger.Log(
+			"method", "ListServiceInstances",
+			"routingKey", routingKey, "result", srvIns, "error", err,
+			"took", time.Since(begin),
+		)
+	}(time.Now())
+	return mw.next.ListServiceInstances(ctx, routingKey)
 }
 
 func (mw serviceLoggingMiddleware) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (srvIns *api.ServiceInstanceResponse, err error) {

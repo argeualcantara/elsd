@@ -1,11 +1,11 @@
 package elssrv_test
 
 import (
-	"testing"
-	"os"
 	"flag"
-	"github.com/hpcwp/elsd/pkg/elssrv"
 	"github.com/hpcwp/elsd/pkg/api"
+	"github.com/hpcwp/elsd/pkg/elssrv"
+	"os"
+	"testing"
 )
 
 var service elssrv.ElsService
@@ -24,7 +24,6 @@ func TestMain(m *testing.M) {
 	// Business domain.
 	service = elssrv.NewBasicService(elssrv.RoutingKeyTableName, *dynamoDbAddr, *id, *secret, *token)
 
-
 	os.Exit(m.Run())
 }
 
@@ -37,13 +36,47 @@ func TestAddKeys(t *testing.T) {
 
 }
 
+func TestListKeys(t *testing.T) {
+	{
+		request := api.AddRoutingKeyRequest{ServiceUri: "http://serviceA:80", RoutingKey: "123"}
+		_, err := service.AddRoutingKey(nil, &request)
+		if err != nil {
+			t.Error("Failed adding routing key")
+		}
+	}
+
+	{
+		request := api.AddRoutingKeyRequest{ServiceUri: "http://serviceB:80", RoutingKey: "123"}
+		_, err := service.AddRoutingKey(nil, &request)
+		if err != nil {
+			t.Error("Failed adding routing key")
+		}
+	}
+
+	requestGet := api.RoutingKeyRequest{Id: "123"}
+	response, err := service.ListServiceInstances(nil, &requestGet)
+
+	if err != nil {
+		t.Error("Failed listing routing key")
+	}
+
+	if len(response.ServiceInstances) != 2 {
+		t.Error("Expected two instances")
+
+	}
+
+	if response.ServiceInstances[0].ServiceUri != "http://serviceA:80" {
+		t.Error("Expected http://localhost:8072")
+	}
+
+}
+
 func TestGetKeys(t *testing.T) {
 	request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "123"}
 	_, err := service.AddRoutingKey(nil, &request)
 	if err != nil {
 		t.Error("Failed adding routing key")
 	}
-
 
 	requestGet := api.RoutingKeyRequest{Id: "123"}
 	response, err2 := service.GetServiceInstanceByKey(nil, &requestGet)
@@ -57,7 +90,6 @@ func TestGetKeys(t *testing.T) {
 	}
 
 }
-
 
 func TestGetManyKeys(t *testing.T) {
 	{
@@ -98,7 +130,6 @@ func TestGetKeysNegative(t *testing.T) {
 		t.Error("Failed adding routing key")
 	}
 
-
 	requestGet := api.RoutingKeyRequest{Id: "124"}
 	_, err2 := service.GetServiceInstanceByKey(nil, &requestGet)
 
@@ -114,7 +145,6 @@ func TestDeleteKeys(t *testing.T) {
 		t.Error("Failed adding routing key")
 	}
 
-
 	requestGet := api.RoutingKeyRequest{Id: "123"}
 	_, err2 := service.GetServiceInstanceByKey(nil, &requestGet)
 
@@ -122,10 +152,9 @@ func TestDeleteKeys(t *testing.T) {
 		t.Error("Failed getting routing key")
 	}
 
-
 	requestDel := api.DeleteRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "123"}
-	_, err3 := service.RemoveRoutingKey(nil,&requestDel)
-	if (err3 != nil) {
+	_, err3 := service.RemoveRoutingKey(nil, &requestDel)
+	if err3 != nil {
 		t.Error("Failed deleting routing key")
 	}
 
@@ -134,6 +163,5 @@ func TestDeleteKeys(t *testing.T) {
 	if err4 == nil {
 		t.Error("Failed deleting routing key, the key is still there")
 	}
-
 
 }

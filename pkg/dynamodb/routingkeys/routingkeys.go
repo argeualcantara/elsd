@@ -103,7 +103,7 @@ func New(tableName string, dynamoAddr string, id string, secret string, token st
 	return &svc
 }
 
-// Get returns all ServiceInstance for a given Routing Key
+// Get returns a single  ServiceInstance for a given Routing Key
 func (s *Service) Get(id string) *Entity {
 	params := &dynamodb.QueryInput{
 		TableName:            &s.tableName,

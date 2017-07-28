@@ -62,6 +62,22 @@ func main() {
 		}
 		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
 
+	case "List":
+		if len(flag.Args()) != 1 {
+			fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Get routing-key \n")
+			os.Exit(1)
+		}
+
+		routingKey := flag.Args()[0]
+
+		v, err := elscli.ListServiceInstances(client, routingKey)
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+
 	case "Add":
 		if len(flag.Args()) != 3 {
 			fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Add routing-key uri tags\n")
