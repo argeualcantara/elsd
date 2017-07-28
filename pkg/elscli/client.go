@@ -28,7 +28,7 @@ func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.Serv
 
 func ListServiceInstances(client api.ElsClient, routingKey string) (*api.ServiceInstanceListResponse, error) {
 	req := &api.RoutingKeyRequest{routingKey}
-	resp, err := client.GetServiceInstanceListByKey(context.Background(), req)
+	resp, err := client.ListServiceInstances(context.Background(), req)
 	if err != nil {
 		log.Fatalf("Error listing routing key", err)
 		return nil, err

@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-var service elssrv.ElsService
+var service elssrv.GRPCServer
 
 func TestMain(m *testing.M) {
 	// call flag.Parse() here if TestMain uses flags
@@ -27,18 +27,19 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+
 func TestAddKeys(t *testing.T) {
 	request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "123"}
 	_, err := service.AddRoutingKey(nil, &request)
 	if err != nil {
+
 		t.Error("Failed adding routing key")
 	}
-
 }
 
 func TestListKeys(t *testing.T) {
 	{
-		request := api.AddRoutingKeyRequest{ServiceUri: "http://serviceA:80", RoutingKey: "123"}
+		request := api.AddRoutingKeyRequest{ServiceUri: "http://serviceA:80", RoutingKey: "555"}
 		_, err := service.AddRoutingKey(nil, &request)
 		if err != nil {
 			t.Error("Failed adding routing key")
@@ -46,39 +47,59 @@ func TestListKeys(t *testing.T) {
 	}
 
 	{
-		request := api.AddRoutingKeyRequest{ServiceUri: "http://serviceB:80", RoutingKey: "123"}
+		request := api.AddRoutingKeyRequest{ServiceUri: "http://serviceB:80", RoutingKey: "555"}
 		_, err := service.AddRoutingKey(nil, &request)
 		if err != nil {
 			t.Error("Failed adding routing key")
 		}
 	}
 
-	requestGet := api.RoutingKeyRequest{Id: "123"}
+	requestGet := api.RoutingKeyRequest{Id: "555"}
 	response, err := service.ListServiceInstances(nil, &requestGet)
 
 	if err != nil {
 		t.Error("Failed listing routing key")
 	}
 
-	if len(response.ServiceInstances) != 2 {
-		t.Error("Expected two instances")
-
+	l := len(response.ServiceInstances)
+	if l != 2 {
+		t.Errorf("Expected 2 instances, got %d" , l)
 	}
 
-	if response.ServiceInstances[0].ServiceUri != "http://serviceA:80" {
-		t.Error("Expected http://localhost:8072")
+	for i := range response.ServiceInstances {
+		t.Logf("Instance %v", response.ServiceInstances[i] )
 	}
+
+
+	{
+		requestDel := api.DeleteRoutingKeyRequest{ServiceUri: "http://serviceA:80", RoutingKey: "555"}
+		_, err3 := service.RemoveRoutingKey(nil, &requestDel)
+		if err3 != nil {
+			t.Error("Failed deleting routing key")
+		}
+	}
+
+
+	{
+		requestDel := api.DeleteRoutingKeyRequest{ServiceUri: "http://serviceB:80", RoutingKey: "555"}
+		_, err3 := service.RemoveRoutingKey(nil, &requestDel)
+		if err3 != nil {
+			t.Error("Failed deleting routing key")
+		}
+	}
+
+
 
 }
 
 func TestGetKeys(t *testing.T) {
-	request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "123"}
+	request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "666"}
 	_, err := service.AddRoutingKey(nil, &request)
 	if err != nil {
 		t.Error("Failed adding routing key")
 	}
 
-	requestGet := api.RoutingKeyRequest{Id: "123"}
+	requestGet := api.RoutingKeyRequest{Id: "666"}
 	response, err2 := service.GetServiceInstanceByKey(nil, &requestGet)
 
 	if err2 != nil {
@@ -93,7 +114,7 @@ func TestGetKeys(t *testing.T) {
 
 func TestGetManyKeys(t *testing.T) {
 	{
-		request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "123"}
+		request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "100"}
 		_, err := service.AddRoutingKey(nil, &request)
 		if err != nil {
 			t.Error("Failed adding routing key")
@@ -101,7 +122,7 @@ func TestGetManyKeys(t *testing.T) {
 	}
 
 	{
-		request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8080", RoutingKey: "125"}
+		request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8080", RoutingKey: "101"}
 		_, err := service.AddRoutingKey(nil, &request)
 		if err != nil {
 			t.Error("Failed adding routing key")
@@ -109,7 +130,7 @@ func TestGetManyKeys(t *testing.T) {
 	}
 
 	{
-		requestGet := api.RoutingKeyRequest{Id: "123"}
+		requestGet := api.RoutingKeyRequest{Id: "100"}
 		response, err2 := service.GetServiceInstanceByKey(nil, &requestGet)
 
 		if err2 != nil {
@@ -121,10 +142,26 @@ func TestGetManyKeys(t *testing.T) {
 		}
 	}
 
+	{
+		requestDel := api.DeleteRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "100"}
+		_, err3 := service.RemoveRoutingKey(nil, &requestDel)
+		if err3 != nil {
+			t.Error("Failed deleting routing key")
+		}
+	}
+
+	{
+		requestDel := api.DeleteRoutingKeyRequest{ServiceUri: "http://localhost:8080", RoutingKey: "101"}
+		_, err3 := service.RemoveRoutingKey(nil, &requestDel)
+		if err3 != nil {
+			t.Error("Failed deleting routing key")
+		}
+	}
+
 }
 
 func TestGetKeysNegative(t *testing.T) {
-	request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "123"}
+	request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "800"}
 	_, err := service.AddRoutingKey(nil, &request)
 	if err != nil {
 		t.Error("Failed adding routing key")
@@ -139,20 +176,20 @@ func TestGetKeysNegative(t *testing.T) {
 }
 
 func TestDeleteKeys(t *testing.T) {
-	request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "123"}
+	request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "900"}
 	_, err := service.AddRoutingKey(nil, &request)
 	if err != nil {
 		t.Error("Failed adding routing key")
 	}
 
-	requestGet := api.RoutingKeyRequest{Id: "123"}
+	requestGet := api.RoutingKeyRequest{Id: "900"}
 	_, err2 := service.GetServiceInstanceByKey(nil, &requestGet)
 
 	if err2 != nil {
 		t.Error("Failed getting routing key")
 	}
 
-	requestDel := api.DeleteRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "123"}
+	requestDel := api.DeleteRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "900"}
 	_, err3 := service.RemoveRoutingKey(nil, &requestDel)
 	if err3 != nil {
 		t.Error("Failed deleting routing key")

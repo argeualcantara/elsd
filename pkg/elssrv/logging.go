@@ -17,13 +17,13 @@ import (
 
 type serviceLoggingMiddleware struct {
 	logger log.Logger
-	next   ElsService
+	next   GRPCServer
 }
 
 // ServiceLoggingMiddleware returns a service middleware that logs the
 // parameters and result of each method invocation.
 func ServiceLoggingMiddleware(logger log.Logger) Middleware {
-	return func(next ElsService) ElsService {
+	return func(next GRPCServer) GRPCServer {
 		return serviceLoggingMiddleware{
 			logger: logger,
 			next:   next,

@@ -1,36 +1,11 @@
-/**
- * (C) Copyright 2012-2016 HP Development Company, L.P.
- * Confidential computer software. Valid license from HP required for possession, use or copying.
- * Consistent with FAR 12.211 and 12.212, Commercial Computer Software,
- * Computer Software Documentation, and Technical Data for Commercial Items are licensed
- * to the U.S. Government under vendor's standard commercial license.
- */
 package elssrv
 
-// This file contains the Service definition, and a basic service
-// implementation. It also includes service middlewares.
-
 import (
-	"errors"
-	google_protobuf "github.com/golang/protobuf/ptypes/empty"
-	"github.com/hpcwp/elsd/pkg/api"
 	"github.com/hpcwp/elsd/pkg/dynamodb/routingkeys"
-	"golang.org/x/net/context"
 )
 
-// Service describes a service that adds things together.
-type ElsService interface {
-	// Get a service instance by key - will randomly get one if multiple instances are registered for that eky
-	GetServiceInstanceByKey(ctx context.Context, request *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error)
-
-	// List all services
-	ListServiceInstances(ctx context.Context, request *api.RoutingKeyRequest) (*api.ServiceInstanceListResponse, error)
-
-	// Add a routingKey to a service
-	AddRoutingKey(context.Context, *api.AddRoutingKeyRequest) (*api.ServiceInstanceResponse, error)
-
-	// Delete a routingKey to a service
-	RemoveRoutingKey(context.Context, *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error)
+type ElsService struct {
+	rk *routingkeys.Service
 }
 
 type ServiceInstance struct {
@@ -38,51 +13,44 @@ type ServiceInstance struct {
 	Metadata string `json:"metadata"`
 }
 
-type basicElsService struct {
-	rksrv *routingkeys.Service
+func (s ElsService) AddKey(key string, srv ServiceInstance) error {
+	if srv.Url == "" {
+		return ErrInvalid
+	}
+
+	if key == "" {
+		return ErrInvalid
+	}
+
+	instance := &routingkeys.ServiceInstance{key,
+		srv.Url,
+		[]string{srv.Metadata}}
+
+	s.rk.Add(instance)
+
+	return nil
 }
 
-// Errors
-var (
-	// ErrEmpty is returned when input is invalid
-	ErrInvalid  = errors.New("invalid routing key")
-	ErrNotFound = errors.New("service instance not found ")
-)
-
-func (bs basicElsService) ListServiceInstances(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceListResponse, error) {
-
-	if routingKey.Id == "" {
-		return &api.ServiceInstanceListResponse{}, ErrInvalid
+func (s ElsService) RemoveService(key string, srvUri string) error {
+	if srvUri == "" {
+		return ErrInvalid
+	}
+	if key == "" {
+		return ErrInvalid
 	}
 
-	entities := bs.rksrv.Get(routingKey.Id)
+	err := s.rk.Remove(srvUri, key)
 
-	if entities == nil {
-		return nil, ErrNotFound
-	}
-	if len(entities.ServiceInstances) == 0 {
-		return nil, ErrNotFound
-	}
-
-	var listResp api.ServiceInstanceListResponse
-
-	for i := range entities.ServiceInstances {
-
-		srvInstance := api.ServiceInstanceResponse{ServiceUri: entities.ServiceInstances[i].Uri, Tags: "rw"}
-		listResp.ServiceInstances = append(listResp.ServiceInstances, &srvInstance)
-
-	}
-	return &listResp, nil
+	return err
 }
 
-// The implementation of the service
-func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
+func (s ElsService) GetService(key string) (*ServiceInstance, error) {
 
-	if routingKey.Id == "" {
-		return &api.ServiceInstanceResponse{}, ErrInvalid
+	if key == "" {
+		return nil, ErrInvalid
 	}
 
-	serviceInstance := bs.rksrv.Get(routingKey.Id)
+	serviceInstance := s.rk.Get(key)
 
 	if serviceInstance == nil {
 		return nil, ErrNotFound
@@ -97,52 +65,39 @@ func (bs basicElsService) GetServiceInstanceByKey(ctx context.Context, routingKe
 		return nil, ErrNotFound
 	}
 
-	srvInstance := api.ServiceInstanceResponse{serviceUrl, "rw"}
+	srvInstance := ServiceInstance{serviceUrl, "rw"}
+
 	return &srvInstance, nil
 }
 
-// The implementation of the service
-func (bs basicElsService) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
-	if addRoutingKeyRequest.ServiceUri == "" {
-		return &api.ServiceInstanceResponse{}, ErrInvalid
-	}
-	if addRoutingKeyRequest.RoutingKey == "" {
-		return &api.ServiceInstanceResponse{}, ErrNotFound
+func (s ElsService) ListServices(key string) ([]*ServiceInstance, error) {
+	if key == "" {
+		return make([]*ServiceInstance, 0), ErrInvalid
 	}
 
-	instance := &routingkeys.ServiceInstance{addRoutingKeyRequest.RoutingKey,
-		addRoutingKeyRequest.ServiceUri,
-		[]string{addRoutingKeyRequest.Tags}}
+	entities := s.rk.Get(key)
 
-	bs.rksrv.Add(instance)
+	if entities == nil {
+		return make([]*ServiceInstance, 0), ErrNotFound
+	}
+	if len(entities.ServiceInstances) == 0 {
+		return make([]*ServiceInstance, 0), ErrNotFound
+	}
 
-	return &api.ServiceInstanceResponse{instance.Uri,
-		instance.Tags[0]}, nil
+	listResp := make([]*ServiceInstance, 0)
 
+	for i := range entities.ServiceInstances {
+		srvInstance := ServiceInstance{entities.ServiceInstances[i].Uri, "rw"}
+		listResp = append(listResp, &srvInstance)
+
+	}
+
+	return listResp, nil
 }
-
-// Delete a routingKey to a service
-func (bs basicElsService) RemoveRoutingKey(ctx context.Context, req *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error) {
-	if req.ServiceUri == "" {
-		return &google_protobuf.Empty{}, ErrInvalid
-	}
-	if req.RoutingKey == "" {
-		return &google_protobuf.Empty{}, ErrInvalid
-	}
-
-	err := bs.rksrv.Remove(req.ServiceUri, req.RoutingKey)
-
-	return &google_protobuf.Empty{}, err
-}
-
-const RoutingKeyTableName = "routingKeys"
 
 // NewBasicService returns a naïve dynamoDb implementation of Service.
-func NewBasicService(tableName string, dynamoAddr string, id string, secret string, token string) ElsService {
+func NewService(tableName string, dynamoAddr string, id string, secret string, token string) ElsService {
 	rk := routingkeys.New(tableName, dynamoAddr, id, secret, token)
 
-	return basicElsService{rk}
+	return ElsService{rk}
 }
-
-// Middleware describes a service (as opposed to endpoint) middleware.
-type Middleware func(ElsService) ElsService

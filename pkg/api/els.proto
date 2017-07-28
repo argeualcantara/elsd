@@ -20,7 +20,7 @@ service Els {
     }
 
     // Get a service by routingKey
-    rpc GetServiceInstanceListByKey (RoutingKeyRequest) returns (ServiceInstanceListResponse) {
+    rpc ListServiceInstances (RoutingKeyRequest) returns (ServiceInstanceListResponse) {
     }
 
     // Add a routingKey to a service

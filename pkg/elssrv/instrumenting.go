@@ -17,14 +17,14 @@ import (
 type serviceInstrumentingMiddleware struct {
 	keys    metrics.Gauge
 	queries metrics.Counter
-	next    ElsService
+	next    GRPCServer
 }
 
 // ServiceInstrumentingMiddleware returns a service middleware that instruments
 // the number of routingKeys accessed over the lifetime of
 // the service.
 func ServiceInstrumentingMiddleware(keys metrics.Gauge, queries metrics.Counter) Middleware {
-	return func(next ElsService) ElsService {
+	return func(next GRPCServer) GRPCServer {
 		return serviceInstrumentingMiddleware{
 			keys:    keys,
 			queries: queries,

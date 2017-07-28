@@ -117,7 +117,7 @@ func main() {
 	}
 
 	// Business domain.
-	var service elssrv.ElsService
+	var service elssrv.GRPCServer
 	{
 		service = elssrv.NewBasicService(elssrv.RoutingKeyTableName, *dynamoDbAddr, *id, *secret, *token)
 		service = elssrv.ServiceLoggingMiddleware(logger)(service)
