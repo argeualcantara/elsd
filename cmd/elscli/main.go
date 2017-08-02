@@ -25,7 +25,7 @@ func main() {
 
 	var (
 		grpcAddr = flag.String("grpc.addr", "", "gRPC (HTTP) address of elssvc")
-		method   = flag.String("method", "Get, Add", "Get routingKey, Add routingKey uri tags")
+		method   = flag.String("method", "Get, Add, Remove", "Get routingKey, Add routingKey uri tags")
 	)
 	flag.Parse()
 
@@ -55,6 +55,22 @@ func main() {
 		routingKey := flag.Args()[0]
 
 		v, err := elscli.GetServiceInstanceByKey(client, routingKey)
+
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+
+	case "List":
+		if len(flag.Args()) != 1 {
+			fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Get routing-key \n")
+			os.Exit(1)
+		}
+
+		routingKey := flag.Args()[0]
+
+		v, err := elscli.ListServiceInstances(client, routingKey)
 
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error: %v\n", err)

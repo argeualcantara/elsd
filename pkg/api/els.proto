@@ -19,6 +19,10 @@ service Els {
     rpc GetServiceInstanceByKey (RoutingKeyRequest) returns (ServiceInstanceResponse) {
     }
 
+    // Get a service by routingKey
+    rpc ListServiceInstances (RoutingKeyRequest) returns (ServiceInstanceListResponse) {
+    }
+
     // Add a routingKey to a service
     rpc AddRoutingKey (AddRoutingKeyRequest) returns (ServiceInstanceResponse) {
     }
@@ -39,6 +43,9 @@ message ServiceInstanceResponse {
     string tags = 2;
 }
 
+message ServiceInstanceListResponse {
+    repeated  ServiceInstanceResponse  serviceInstances = 1;
+}
 
 message AddRoutingKeyRequest {
     string serviceUri = 1;

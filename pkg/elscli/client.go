@@ -18,11 +18,25 @@ func GetServiceInstanceByKey(client api.ElsClient, routingKey string) (*api.Serv
 	req := &api.RoutingKeyRequest{routingKey}
 	resp, err := client.GetServiceInstanceByKey(context.Background(), req)
 	if err != nil {
-		log.Fatalf("Error gettting routing key", err)
+		log.Fatalf("Error getting routing key", err)
 		return nil, err
 	}
 
-	log.Info("Rotung key %s and tags %s", resp.GetServiceUri(), resp.GetTags())
+	log.Info("Roting key %s and tags %s", resp.GetServiceUri(), resp.GetTags())
+	return resp, nil
+}
+
+func ListServiceInstances(client api.ElsClient, routingKey string) (*api.ServiceInstanceListResponse, error) {
+	req := &api.RoutingKeyRequest{routingKey}
+	resp, err := client.ListServiceInstances(context.Background(), req)
+	if err != nil {
+		log.Fatalf("Error listing routing key", err)
+		return nil, err
+	}
+
+	for i := range resp.ServiceInstances {
+		log.Info("Roting key %s and tags %s", resp.ServiceInstances[i].GetServiceUri(), resp.ServiceInstances[i].GetTags())
+	}
 	return resp, nil
 }
 
