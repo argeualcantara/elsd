@@ -35,7 +35,6 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-
 func TestAddKeys(t *testing.T) {
 	request := api.AddRoutingKeyRequest{ServiceUri: "http://localhost:8072", RoutingKey: "123"}
 	_, err := service.AddRoutingKey(nil, &request)
@@ -71,13 +70,12 @@ func TestListKeys(t *testing.T) {
 
 	l := len(response.ServiceInstances)
 	if l != 2 {
-		t.Errorf("Expected 2 instances, got %d" , l)
+		t.Errorf("Expected 2 instances, got %d", l)
 	}
 
 	for i := range response.ServiceInstances {
-		t.Logf("Instance %v", response.ServiceInstances[i] )
+		t.Logf("Instance %v", response.ServiceInstances[i])
 	}
-
 
 	{
 		requestDel := api.DeleteRoutingKeyRequest{ServiceUri: "http://serviceA:80", RoutingKey: "555"}
@@ -87,7 +85,6 @@ func TestListKeys(t *testing.T) {
 		}
 	}
 
-
 	{
 		requestDel := api.DeleteRoutingKeyRequest{ServiceUri: "http://serviceB:80", RoutingKey: "555"}
 		_, err3 := service.RemoveRoutingKey(nil, &requestDel)
@@ -95,8 +92,6 @@ func TestListKeys(t *testing.T) {
 			t.Error("Failed deleting routing key")
 		}
 	}
-
-
 
 }
 

@@ -12,7 +12,6 @@ import (
 	"testing"
 )
 
-
 func TestElsService_AddKey(t *testing.T) {
 
 	type args struct {
@@ -24,8 +23,8 @@ func TestElsService_AddKey(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{name:"simple",  args:	args{ key: "1112", srv: ServiceInstance { "127.0.0.1",  "rw"}}, wantErr: false},
-		{name:"simple",  args:	args{ key: "2233", srv: ServiceInstance { "127.0.0.1",  "rw"}}, wantErr: false},
+		{name: "simple", args: args{key: "1112", srv: ServiceInstance{"127.0.0.1", "rw"}}, wantErr: false},
+		{name: "simple", args: args{key: "2233", srv: ServiceInstance{"127.0.0.1", "rw"}}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
