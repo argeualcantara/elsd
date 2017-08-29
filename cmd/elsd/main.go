@@ -92,7 +92,6 @@ func main() {
 
 	logger.Log("debugAddr", debugAddr, "grpcAddr", grpcAddr, "dynamodbAddr", dynamoDbAddr)
 
-
 	// Queries domain.
 	var queries metrics.Counter
 	{
@@ -103,7 +102,6 @@ func main() {
 			Help:      "Total queries.",
 		}, []string{})
 	}
-
 
 	// Metrics domain.
 	var keys metrics.Gauge
@@ -123,6 +121,8 @@ func main() {
 		service = elssrv.ServiceLoggingMiddleware(logger)(service)
 		service = elssrv.ServiceInstrumentingMiddleware(keys, queries)(service)
 	}
+
+	var healthService elssrv.HealthGRPCServer
 
 	// Mechanical domain.
 	errc := make(chan error)
@@ -150,7 +150,7 @@ func main() {
 		errc <- http.ListenAndServe(*debugAddr, m)
 	}()
 
-	// gRPC transport.
+	// gRPC elsd transport.
 	go func() {
 		logger := log.With(logger, "transport", "gRPC")
 
@@ -162,6 +162,7 @@ func main() {
 
 		s := grpc.NewServer()
 		api.RegisterElsServer(s, service)
+		api.RegisterHealthServer(s, healthService)
 
 		logger.Log("addr", grpcAddr)
 		errc <- s.Serve(ln)
