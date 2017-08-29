@@ -39,18 +39,27 @@ You can build the client, add some routing keys and get them
 
 ```
 go install  github.com/hpcwp/elsd/cmd/elscli
-elscli -grpc.addr localhost:8082  -method Add   123 http://localhost:8072 rw
-elscli -grpc.addr localhost:8082  -method Add   123 http://localhost:8080 r
-elscli -grpc.addr localhost:8082  -method Add   124 http://localhost:8072 rw
-elscli -grpc.addr localhost:8082  -method Add   125 http://localhost:8080 rw
+```
+
+Test elsd server is working
+```
+elscli
+
 ```
 
 ```
-elscli -grpc.addr localhost:8082  -method Get   125
+elscli -method Add   123 http://localhost:8072 rw
+elscli -method Add   123 http://localhost:8080 r
+elscli -method Add   124 http://localhost:8072 rw
+elscli -method Add   125 http://localhost:8080 rw
 ```
 
 ```
-elscli -grpc.addr localhost:8082  -method Remove  125 http://localhost:8080 
+elscli -method Get   125
+```
+
+```
+elscli -method Remove  125 http://localhost:8080 
 ```
 
 Remove is an idempotent operation, so you can call it multiple times with the same result,
