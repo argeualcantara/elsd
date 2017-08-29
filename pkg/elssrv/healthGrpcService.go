@@ -5,24 +5,18 @@
  * Computer Software Documentation, and Technical Data for Commercial Items are licensed
  * to the U.S. Government under vendor's standard commercial license.
  */
- 
-syntax = "proto3";
 
-package grpc.health.v1;
+package elssrv
 
-message HealthCheckRequest {
-  string service = 1;
+import (
+	"github.com/hpcwp/elsd/pkg/api"
+	"golang.org/x/net/context"
+)
+
+type HealthGRPCServer struct {
 }
 
-message HealthCheckResponse {
-  enum ServingStatus {
-    UNKNOWN = 0;
-    SERVING = 1;
-    NOT_SERVING = 2;
-  }
-  ServingStatus status = 1;
-}
-
-service Health {
-  rpc Check(HealthCheckRequest) returns (HealthCheckResponse);
+func (HealthGRPCServer) Check(context.Context, *api.HealthCheckRequest) (*api.HealthCheckResponse, error) {
+	//TODO: check the Els service is actually working
+	return &api.HealthCheckResponse{api.HealthCheckResponse_SERVING}, nil
 }

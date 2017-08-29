@@ -33,8 +33,7 @@ type GRPCServer interface {
 	RemoveRoutingKey(context.Context, *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error)
 }
 
-
-type basicGPCServer struct {
+type basicGRPCServer struct {
 	rksrv *routingkeys.Service
 }
 
@@ -45,7 +44,7 @@ var (
 	ErrNotFound = errors.New("service instance not found ")
 )
 
-func (bs basicGPCServer) ListServiceInstances(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceListResponse, error) {
+func (bs basicGRPCServer) ListServiceInstances(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceListResponse, error) {
 
 	if routingKey.Id == "" {
 		return &api.ServiceInstanceListResponse{}, ErrInvalid
@@ -71,7 +70,7 @@ func (bs basicGPCServer) ListServiceInstances(ctx context.Context, routingKey *a
 }
 
 // The implementation of the service
-func (bs basicGPCServer) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
+func (bs basicGRPCServer) GetServiceInstanceByKey(ctx context.Context, routingKey *api.RoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
 
 	if routingKey.Id == "" {
 		return &api.ServiceInstanceResponse{}, ErrInvalid
@@ -97,7 +96,7 @@ func (bs basicGPCServer) GetServiceInstanceByKey(ctx context.Context, routingKey
 }
 
 // The implementation of the service
-func (bs basicGPCServer) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
+func (bs basicGRPCServer) AddRoutingKey(ctx context.Context, addRoutingKeyRequest *api.AddRoutingKeyRequest) (*api.ServiceInstanceResponse, error) {
 	if addRoutingKeyRequest.ServiceUri == "" {
 		return &api.ServiceInstanceResponse{}, ErrInvalid
 	}
@@ -117,7 +116,7 @@ func (bs basicGPCServer) AddRoutingKey(ctx context.Context, addRoutingKeyRequest
 }
 
 // Delete a routingKey to a service
-func (bs basicGPCServer) RemoveRoutingKey(ctx context.Context, req *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error) {
+func (bs basicGRPCServer) RemoveRoutingKey(ctx context.Context, req *api.DeleteRoutingKeyRequest) (*google_protobuf.Empty, error) {
 	if req.ServiceUri == "" {
 		return &google_protobuf.Empty{}, ErrInvalid
 	}
@@ -136,7 +135,7 @@ const RoutingKeyTableName = "routingKeys"
 func NewBasicService(tableName string, dynamoAddr string, id string, secret string, token string) GRPCServer {
 	rk := routingkeys.New(tableName, dynamoAddr, id, secret, token)
 
-	return basicGPCServer{rk}
+	return basicGRPCServer{rk}
 }
 
 // Middleware describes a service (as opposed to endpoint) middleware.

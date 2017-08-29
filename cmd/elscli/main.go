@@ -8,6 +8,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/hpcwp/elsd/pkg/api"
@@ -24,8 +25,8 @@ func main() {
 	// provide the direct address of an elssvc.
 
 	var (
-		grpcAddr = flag.String("grpc.addr", "", "gRPC (HTTP) address of elssvc")
-		method   = flag.String("method", "Get, Add, Remove", "Get routingKey, Add routingKey uri tags")
+		grpcAddr = flag.String("grpc.addr", "localhost:8082", "gRPC (HTTP) address of elssvc")
+		method   = flag.String("method", "Check", "Get routingKey, Add routingKey uri tags")
 	)
 	flag.Parse()
 
@@ -42,77 +43,91 @@ func main() {
 	defer conn.Close()
 
 	client := api.NewElsClient(conn)
-
-	//grpcclient.GetServiceInstanceByKey()
+	healthClient := api.NewHealthClient(conn)
 
 	switch *method {
+	case "Check":
+		check(healthClient)
+
 	case "Get":
-		if len(flag.Args()) != 1 {
-			fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Get routing-key \n")
-			os.Exit(1)
-		}
-
-		routingKey := flag.Args()[0]
-
-		v, err := elscli.GetServiceInstanceByKey(client, routingKey)
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+		get(client)
 
 	case "List":
-		if len(flag.Args()) != 1 {
-			fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Get routing-key \n")
-			os.Exit(1)
-		}
-
-		routingKey := flag.Args()[0]
-
-		v, err := elscli.ListServiceInstances(client, routingKey)
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+		list(client)
 
 	case "Add":
-		if len(flag.Args()) != 3 {
-			fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Add routing-key uri tags\n")
-			os.Exit(1)
-		}
-
-		routingKey := flag.Args()[0]
-		uri := flag.Args()[1]
-		tags := flag.Args()[2]
-
-		v, err := elscli.AddServiceInstance(client, routingKey, uri, []string{tags})
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+		add(client)
 
 	case "Remove":
-		if len(flag.Args()) != 2 {
-			fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Remove routing-key uri \n")
-			os.Exit(1)
-		}
-		routingKey := flag.Args()[0]
-		uri := flag.Args()[1]
-
-		v, err := elscli.RemoveServiceInstance(client, routingKey, uri)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %v\n", err)
-			os.Exit(1)
-		}
-		fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+		remove(client)
 
 	default:
 		fmt.Fprintf(os.Stderr, "error: invalid method %q\n", method)
 		os.Exit(1)
 	}
 
+}
+func remove(client api.ElsClient) {
+	if len(flag.Args()) != 2 {
+		fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Remove routing-key uri \n")
+		os.Exit(1)
+	}
+	routingKey := flag.Args()[0]
+	uri := flag.Args()[1]
+	v, err := elscli.RemoveServiceInstance(client, routingKey, uri)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+}
+func add(client api.ElsClient) {
+	if len(flag.Args()) != 3 {
+		fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Add routing-key uri tags\n")
+		os.Exit(1)
+	}
+	routingKey := flag.Args()[0]
+	uri := flag.Args()[1]
+	tags := flag.Args()[2]
+	v, err := elscli.AddServiceInstance(client, routingKey, uri, []string{tags})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+}
+func list(client api.ElsClient) {
+	if len(flag.Args()) != 1 {
+		fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Get routing-key \n")
+		os.Exit(1)
+	}
+	routingKey := flag.Args()[0]
+	v, err := elscli.ListServiceInstances(client, routingKey)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+}
+func get(client api.ElsClient) {
+	if len(flag.Args()) != 1 {
+		fmt.Fprintf(os.Stderr, "usage: elscli -grpc.addr <address> -method Get routing-key \n")
+		os.Exit(1)
+	}
+	routingKey := flag.Args()[0]
+	v, err := elscli.GetServiceInstanceByKey(client, routingKey)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Fprintf(os.Stdout, "%d  %d\n", routingKey, v)
+}
+
+func check(healthClient api.HealthClient) {
+	_, err := healthClient.Check(context.Background(), &api.HealthCheckRequest{"els"})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "elsd service is not responding \n")
+		os.Exit(1)
+	}
+	fmt.Fprintf(os.Stdout, "elsd is ready \n")
 }
