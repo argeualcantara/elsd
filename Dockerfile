@@ -12,6 +12,6 @@ RUN go install github.com/hpcwp/elsd/cmd/elsd
 
 WORKDIR  /go/src/github.com/hpcwp/elsd
 
-ENTRYPOINT /go/bin/elsd -dynamodb.addr
+ENTRYPOINT /go/bin/elsd
 EXPOSE 8082 8080
 
