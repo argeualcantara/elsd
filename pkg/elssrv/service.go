@@ -97,15 +97,14 @@ func (s ElsService) ListServices(key string) ([]*ServiceInstance, error) {
 	for i := range entities.ServiceInstances {
 		srvInstance := ServiceInstance{entities.ServiceInstances[i].Uri, "rw"}
 		listResp = append(listResp, &srvInstance)
-
 	}
 
 	return listResp, nil
 }
 
 // NewBasicService returns a naïve dynamoDb implementation of Service.
-func NewService(tableName string, dynamoAddr string, id string, secret string, token string) ElsService {
-	rk := routingkeys.New(tableName, dynamoAddr, id, secret, token)
+func NewService(tableName string, dynamoAddr string, region string, id string, secret string, token string) ElsService {
+	rk := routingkeys.New(tableName, dynamoAddr, region, id, secret, token)
 
 	return ElsService{rk}
 }

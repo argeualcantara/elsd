@@ -9,17 +9,17 @@ package routingkeys
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
-	"log"
 )
 
 const (
 	getProjectionExpression = "Id, Uri, Tags"
-	region                  = "us-west-2"
 )
 
 // Service provides the s object
@@ -75,7 +75,7 @@ func (s *Service) createTable() (*dynamodb.CreateTableOutput, error) {
 }
 
 // New creates a new RoutingKeysService
-func New(tableName string, dynamoAddr string, id string, secret string, token string) *Service {
+func New(tableName string, dynamoAddr string, region string, id string, secret string, token string) *Service {
 	sess, err := session.NewSession()
 	if err != nil {
 		panic(err)

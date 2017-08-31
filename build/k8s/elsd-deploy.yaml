@@ -21,7 +21,7 @@ spec:
   selector:
     app: elsd
 ---
-apiVersion: app/v1beta1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: elsd
@@ -36,10 +36,26 @@ spec:
       labels: {app: elsd}
     spec:
       containers:
-      - name: datetime
+      - name: elsd
         image: gcr.io/print-cloud-software/elsd:latest
-        imagePullPolicy: IfNotPresent        
+        imagePullPolicy: Always        
         ports:
         - containerPort: 8080
-        - containerPort: 8082        
+        - containerPort: 8082
+        command: ["/go/bin/elsd"]        
+        args: ["-dynamodb.addr", "https://dynamodb.us-west-2.amazonaws.com", 
+        "-aws.id", "$(AWS_ACCESS_KEY_ID)", 
+        "-aws.secret", "$(AWS_SECRET_ACCESS_KEY)",
+        "-aws.region", "us-west-2"]
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret
+              key: AWS_SECRET_ACCESS_KEY
 ---

@@ -71,7 +71,8 @@ func main() {
 	var (
 		debugAddr    = flag.String("debug.addr", ":8080", "Debug and metrics listen address")
 		grpcAddr     = flag.String("grpc.addr", ":8082", "gRPC (HTTP) listen address")
-		dynamoDbAddr = flag.String("dynamodb.addr", "http://localhost:8000", "DynamoDb (HTTP) address")
+		dynamoDbAddr = flag.String("dynamodb.addr", "http://localhost:8000", "DynamoDb (HTTP/HTTPS) address")
+		region       = flag.String("aws.region", "us-west-2", "AWS dynamo region")
 		id           = flag.String("aws.id", "123", "AWS id")
 		secret       = flag.String("aws.secret", "123", "AWS secret")
 		token        = flag.String("aws.token", "", "AWS token")
@@ -117,7 +118,7 @@ func main() {
 	// Business domain.
 	var service elssrv.GRPCServer
 	{
-		service = elssrv.NewBasicService(elssrv.RoutingKeyTableName, *dynamoDbAddr, *id, *secret, *token)
+		service = elssrv.NewBasicService(elssrv.RoutingKeyTableName, *dynamoDbAddr, *region, *id, *secret, *token)
 		service = elssrv.ServiceLoggingMiddleware(logger)(service)
 		service = elssrv.ServiceInstrumentingMiddleware(keys, queries)(service)
 	}

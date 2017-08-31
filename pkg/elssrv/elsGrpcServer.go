@@ -12,6 +12,7 @@ package elssrv
 
 import (
 	"errors"
+
 	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	"github.com/hpcwp/elsd/pkg/api"
 	"github.com/hpcwp/elsd/pkg/dynamodb/routingkeys"
@@ -132,8 +133,8 @@ func (bs basicGRPCServer) RemoveRoutingKey(ctx context.Context, req *api.DeleteR
 const RoutingKeyTableName = "routingKeys"
 
 // NewBasicService returns a naïve dynamoDb implementation of Service.
-func NewBasicService(tableName string, dynamoAddr string, id string, secret string, token string) GRPCServer {
-	rk := routingkeys.New(tableName, dynamoAddr, id, secret, token)
+func NewBasicService(tableName string, dynamoAddr string, region string, id string, secret string, token string) GRPCServer {
+	rk := routingkeys.New(tableName, dynamoAddr, region, id, secret, token)
 
 	return basicGRPCServer{rk}
 }
