@@ -24,7 +24,7 @@ services:
       - "8082:8082" # gRPC
       - "8080:8080" # http
     entrypoint:
-         - /go/bin/elsd
+         - ./elsd
          - -dynamodb.addr
          - http://dynamodb:8000
     links:
