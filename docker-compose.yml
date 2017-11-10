@@ -9,7 +9,7 @@
 version: "3"
 services:
   elsd:
-    image: hpccp/elsd:latest
+    image: gcr.io/print-cloud-software/elsd
     container_name: elsd
     build:
       context: .
