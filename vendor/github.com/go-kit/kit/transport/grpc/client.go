@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -37,9 +36,6 @@ func NewClient(
 	grpcReply interface{},
 	options ...ClientOption,
 ) *Client {
-	if strings.IndexByte(serviceName, '.') == -1 {
-		serviceName = "pb." + serviceName
-	}
 	c := &Client{
 		client: cc,
 		method: fmt.Sprintf("/%s/%s", serviceName, method),
@@ -95,7 +91,7 @@ func (c Client) Endpoint() endpoint.Endpoint {
 		for _, f := range c.before {
 			ctx = f(ctx, md)
 		}
-		ctx = metadata.NewContext(ctx, *md)
+		ctx = metadata.NewOutgoingContext(ctx, *md)
 
 		var header, trailer metadata.MD
 		grpcReply := reflect.New(c.grpcReply).Interface()
