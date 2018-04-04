@@ -25,10 +25,10 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: elsd
-  labels: 
+  labels:
     app: elsd
 spec:
-  replicas: 1  
+  replicas: 1
   template:
     metadata:
       annotations:
@@ -38,13 +38,13 @@ spec:
       containers:
       - name: elsd
         image: gcr.io/print-cloud-software/elsd:latest
-        imagePullPolicy: Always        
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         - containerPort: 8082
-        command: ["/go/bin/elsd"]        
-        args: ["-dynamodb.addr", "https://dynamodb.us-west-2.amazonaws.com", 
-        "-aws.id", "$(AWS_ACCESS_KEY_ID)", 
+        command: ["/root/elsd"]
+        args: ["-dynamodb.addr", "https://dynamodb.us-west-2.amazonaws.com",
+        "-aws.id", "$(AWS_ACCESS_KEY_ID)",
         "-aws.secret", "$(AWS_SECRET_ACCESS_KEY)",
         "-aws.region", "us-west-2"]
         env:

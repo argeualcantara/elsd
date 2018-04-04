@@ -76,12 +76,13 @@ func (s *Service) createTable() (*dynamodb.CreateTableOutput, error) {
 
 // New creates a new RoutingKeysService
 func New(tableName string, dynamoAddr string, region string, id string, secret string, token string) *Service {
-	sess, err := session.NewSession()
+	creds := credentials.NewStaticCredentials(id, secret, token)
+	sess, err := session.NewSession(&aws.Config{
+    Credentials: creds,
+  })
 	if err != nil {
 		panic(err)
 	}
-
-	creds := credentials.NewStaticCredentials(id, secret, token)
 
 	localConfig := aws.NewConfig().
 		WithCredentials(creds).
