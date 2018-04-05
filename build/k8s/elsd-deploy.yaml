@@ -11,6 +11,7 @@ metadata:
   labels:
     name: elsd
 spec:
+  type: LoadBalancer
   ports:
   - port: 8080
     targetPort: 8080
@@ -37,7 +38,7 @@ spec:
     spec:
       containers:
       - name: elsd
-        image: gcr.io/print-cloud-software/elsd:latest
+        image: r.jdkr.io/galo/elsd:1.0.3
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

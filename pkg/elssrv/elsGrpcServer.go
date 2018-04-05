@@ -130,7 +130,7 @@ func (bs basicGRPCServer) RemoveRoutingKey(ctx context.Context, req *api.DeleteR
 	return &google_protobuf.Empty{}, err
 }
 
-const RoutingKeyTableName = "routingKeys"
+const RoutingKeyTableName = "RoutingKeys.v1"
 
 // NewBasicService returns a naïve dynamoDb implementation of Service.
 func NewBasicService(tableName string, dynamoAddr string, region string, id string, secret string, token string) GRPCServer {

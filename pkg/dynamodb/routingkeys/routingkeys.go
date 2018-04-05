@@ -78,8 +78,8 @@ func (s *Service) createTable() (*dynamodb.CreateTableOutput, error) {
 func New(tableName string, dynamoAddr string, region string, id string, secret string, token string) *Service {
 	creds := credentials.NewStaticCredentials(id, secret, token)
 	sess, err := session.NewSession(&aws.Config{
-    Credentials: creds,
-  })
+		Credentials: creds,
+	})
 	if err != nil {
 		panic(err)
 	}
